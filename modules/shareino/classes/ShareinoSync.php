@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2015-2016 Shareino
  *
@@ -19,6 +18,7 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
+
 class ShareinoSync extends ObjectModel
 {
     public $id_shareino_sync;
