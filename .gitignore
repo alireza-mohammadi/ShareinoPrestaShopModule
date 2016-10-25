@@ -3,6 +3,6 @@
 !modules/
 
 modules/*
-!modules/Shareino/
+!modules/shareino/
 !README.md
 !LICENSES

@@ -30,7 +30,7 @@ class Shareino extends Module
 
     public function __construct()
     {
-        $this->name = 'Shareino';
+        $this->name = 'shareino';
         $this->tab = 'export';
         $this->version = '1.2.0';
         $this->author = 'Saeed Darvish';
