@@ -87,6 +87,10 @@ class Shareino extends Module
      */
     public function getContent()
     {
+        if (((bool)Tools::isSubmit('submitShareinoModule')) == true) {
+            $this->postProcess();
+        }
+
         $this->context->smarty->assign('module_dir', $this->_path);
 
         $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -109,7 +113,7 @@ class Shareino extends Module
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-
+        
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),
@@ -136,7 +140,7 @@ class Shareino extends Module
                         'type' => 'text',
                         'prefix' => '<i class="icon icon-key"></i>',
                         'desc' => $this->l('Enter Shareino\'s webservice token'),
-                        'name' => 'SHAREINO_ACCOUNT_EMAIL',
+                        'name' => 'SHAREINO_API_TOKEN',
                         'label' => $this->l('Shareino Token'),
                     )
                 ),
@@ -155,6 +159,18 @@ class Shareino extends Module
         return array(
             'SHAREINO_API_TOKEN' => Configuration::get('SHAREINO_API_TOKEN', "")
         );
+    }
+
+    /**
+     * Save form data.
+     */
+    protected function postProcess()
+    {
+        $form_values = $this->getConfigFormValues();
+
+        foreach (array_keys($form_values) as $key) {
+           Configuration::updateValue($key, Tools::getValue($key));
+        }
     }
 
     public function hookActionProductDelete()
