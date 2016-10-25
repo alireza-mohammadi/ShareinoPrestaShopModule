@@ -13,9 +13,9 @@
  * versions in the future. If you wish to customize Shareino for your
  * needs please refer to https://github.com/SaeedDarvish/PrestaShopShareinoModule for more information.
  *
- *  @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
- *  @copyright 2015-2016 Shareino Co
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
+ * @copyright 2015-2016 Shareino Co
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
 
