@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2015-2016 Shareino
  *
@@ -18,7 +19,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
-
 class OrganizeCategories extends ObjectModel
 {
     public $id_shareino_categories;
@@ -64,12 +64,14 @@ class OrganizeCategories extends ObjectModel
         if ($auto_date && property_exists($this, 'date_upd')) {
             $this->date_upd = date('Y-m-d H:i:s');
         }
-        $result = Db::getInstance()->insert($this->def['table'],
-            $this->getFields(),
-            $null_values,
-            true,
-            Db::REPLACE
-        );
+
+        $result = Db::getInstance()
+            ->insert($this->def['table'],
+                $this->getFields(),
+                $null_values,
+                true,
+                Db::REPLACE
+            );
 
         if (!$result) {
             return false;
@@ -120,7 +122,7 @@ class OrganizeCategories extends ObjectModel
                 unset($notmatching[$item["cat_id"]]);
             }
         }
-//        d($notmatching);
+
         foreach ($notmatching as $item) {
             $key = key($item);
             $productCategories["notMatching"][$key] = $item[$key];
@@ -130,7 +132,6 @@ class OrganizeCategories extends ObjectModel
 
     public static function bulkdelete($id)
     {
-
         $tbl = _DB_PREFIX_ . self::$definition['table'];
 
         $sql = "DELETE FROM $tbl WHERE id_shareino_organized in (" . implode(",", $id) . ")";
