@@ -1,0 +1,8 @@
+/*
+!.gitignore
+!modules/
+
+modules/*
+!modules/Shareino/
+!README.md
+!LICENSES
