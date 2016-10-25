@@ -17,11 +17,11 @@
 * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  Tejarat Ejtemaie Eram
 *}
-{$message}
+{$message|escape:'htmlall':'UTF-8'}
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <img src="{$module_dir}views/img/logo.png" alt="" title="" style="margin-bottom: 20px;"/>
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/logo.png" alt="" title="" style="margin-bottom: 20px;"/>
         </div>
     </div>
 </div>
