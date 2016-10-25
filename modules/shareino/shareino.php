@@ -25,7 +25,6 @@ if (!defined('_PS_VERSION_')) {
 
 class Shareino extends Module
 {
-
     protected $config_form = false;
 
     public function __construct()
@@ -113,7 +112,7 @@ class Shareino extends Module
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        
+
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),

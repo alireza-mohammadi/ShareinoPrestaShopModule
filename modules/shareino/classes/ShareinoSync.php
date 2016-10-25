@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2015-2016 Shareino
  *
@@ -18,7 +19,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
-
 class ShareinoSync extends ObjectModel
 {
 
@@ -91,7 +91,6 @@ class ShareinoSync extends ObjectModel
         Hook::exec('actionObject' . get_class($this) . 'AddAfter', array('object' => $this));
 
         return $result;
-
     }
 
     public function deleteProduct($id)
@@ -102,29 +101,34 @@ class ShareinoSync extends ObjectModel
         $sql = "DELETE FROM $tbl WHERE product_id=$id";
 
         return Db::getInstance()->query($sql);
-
-
     }
 
     public function getProductsIds($ids, $all = false)
     {
         if (empty($ids) && !$all)
             return false;
-        $ids = implode(", ", $ids);
-        $query = "SELECT `product_id` from " . _DB_PREFIX_ . "shareino_sync";
-        if (!$all)
-            $query .= " WHERE id_shareino_sync in ($ids)";
+        else {
+
+            $ids = implode(", ", $ids);
+
+            $query = "SELECT `product_id` from " . _DB_PREFIX_ . "shareino_sync";
+
+            $query .= !$all ? " WHERE id_shareino_sync in ($ids)" : "";
 
 
-        $product_ids = Db::getInstance()->executeS($query);
+            $product_ids = Db::getInstance()->executeS($query);
 
-        $ids = array();
-        if ($product_ids) {
-            foreach ($product_ids as $pid)
-                $ids[] = $pid["product_id"];
-            return $ids;
-        } else
-            return false;
+            $ids = array();
+
+            if ($product_ids) {
+
+                foreach ($product_ids as $pid)
+                    $ids[] = $pid["product_id"];
+
+                return $ids;
+            } else
+                return false;
+        }
     }
 
     public function changeProductsStatus($ids, $status = 0, $all = false)

@@ -64,12 +64,14 @@ class OrganizeCategories extends ObjectModel
         if ($auto_date && property_exists($this, 'date_upd')) {
             $this->date_upd = date('Y-m-d H:i:s');
         }
-        if (!$result = Db::getInstance()->insert($this->def['table'],
+        $result = Db::getInstance()->insert($this->def['table'],
             $this->getFields(),
             $null_values,
             true,
-            Db::REPLACE)
-        ) {
+            Db::REPLACE
+        );
+
+        if (!$result) {
             return false;
         }
 
@@ -84,7 +86,6 @@ class OrganizeCategories extends ObjectModel
         Hook::exec('actionObject' . get_class($this) . 'AddAfter', array('object' => $this));
 
         return $result;
-
     }
 
     public static function getShareinoids($categories)
@@ -101,11 +102,11 @@ class OrganizeCategories extends ObjectModel
             $notmatching[$category["id_category"]]
                 = array($category["link_rewrite"] => $category["name"]);
         }
+
         $categoriesIds = implode(",", $categoriesIds);
 
         $query = "SELECT cat_id,ids from " . _DB_PREFIX_ .
             "shareino_organized WHERE cat_id in ($categoriesIds)";
-
 
         $result = Db::getInstance()->executeS($query);
 
@@ -125,7 +126,6 @@ class OrganizeCategories extends ObjectModel
             $productCategories["notMatching"][$key] = $item[$key];
         }
         return $productCategories;
-
     }
 
     public static function bulkdelete($id)
@@ -136,7 +136,5 @@ class OrganizeCategories extends ObjectModel
         $sql = "DELETE FROM $tbl WHERE id_shareino_organized in (" . implode(",", $id) . ")";
 
         return Db::getInstance()->query($sql);
-
-
     }
 }
