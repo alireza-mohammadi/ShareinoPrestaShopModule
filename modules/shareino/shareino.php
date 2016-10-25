@@ -44,8 +44,7 @@ class Shareino extends Module
         $this->displayName = $this->l('Shareino');
         $this->description = $this->l('Make Sync Your Product with shareino server');
 
-        $this->confirmUninstall = $this->l('if You unistall it you cant sync to shareino,'
-            . 'Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         $token = Configuration::get('SHAREINO_API_TOKEN');
 
