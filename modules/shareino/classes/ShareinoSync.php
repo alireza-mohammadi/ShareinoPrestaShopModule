@@ -110,7 +110,6 @@ class ShareinoSync extends ObjectModel
 
         $query .= !$all ? " WHERE id_shareino_sync in ($ids)" : "";
 
-
         $product_ids = Db::getInstance()->executeS($query);
 
         $ids = array();
@@ -121,18 +120,15 @@ class ShareinoSync extends ObjectModel
         return $ids;
 
     }
-    
+
     public function changeProductsStatus($ids, $status = 0, $all = false)
     {
 
-        if (empty($ids) && !$all)
-            return false;
         $ids = implode(", ", $ids);
         $query = "UPDATE " . _DB_PREFIX_ . "shareino_sync SET status=$status";
-        if (!$all)
-            $query .= " WHERE id_shareino_sync in ($ids);";
-        else
-            $query .= " WHERE 1;";
+
+        $query .= !$all ? " WHERE id_shareino_sync in ($ids);" : " WHERE 1;";
+
         return Db::getInstance()->execute($query);
     }
 }
