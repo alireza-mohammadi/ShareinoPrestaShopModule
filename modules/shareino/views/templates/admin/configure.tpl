@@ -26,11 +26,11 @@
     </div>
 </div>
 <div class="panel">
-    <h3><i class="icon icon-tags"></i> {l s='Documentation' mod='Shareino'}</h3>
+    <h3><i class="icon icon-tags"></i> {l s='Documentation' mod='shareino'}</h3>
     <p>
-        &raquo; {l s='You can get a PDF documentation to configure this module' mod='Shareino'} :
+        &raquo; {l s='You can get a PDF documentation to configure this module' mod='shareino'} :
     <ul>
-        <li><a href="#" target="_blank">{l s='English' mod='Shareino'}</a></li>
+        <li><a href="#" target="_blank">{l s='English' mod='shareino'}</a></li>
     </ul>
     </p>
 </div>
