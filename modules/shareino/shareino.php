@@ -44,7 +44,8 @@ class Shareino extends Module
         $this->displayName = $this->l('Shareino');
         $this->description = $this->l('Make Sync Your Product with shareino server');
 
-        $this->confirmUninstall = $this->l('if You unistall it you cant sync to shareino,Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('if You unistall it you cant sync to shareino,'
+            . 'Are you sure you want to uninstall?');
 
         $token = Configuration::get('SHAREINO_API_TOKEN');
 
@@ -55,14 +56,6 @@ class Shareino extends Module
 
     public function install()
     {
-
-        if (Shop::isFeatureActive())
-            Shop::setContext(Shop::CONTEXT_ALL);
-
-        //Init
-        if (!ConfigurationCore::get("SHAREINO_API_TOKEN"))
-            ConfigurationCore::updateValue('SHAREINO_API_TOKEN', '');
-
         include(dirname(__FILE__) . '/sql/install.php');
 
         $this->installTabs();
@@ -90,7 +83,6 @@ class Shareino extends Module
         return parent::uninstall();
     }
 
-
     /**
      * Load the configuration form
      */
@@ -100,7 +92,7 @@ class Shareino extends Module
 
         $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
 
-        return $output.$this->renderForm();
+        return $output . $this->renderForm();
     }
 
     protected function renderForm()
