@@ -79,6 +79,14 @@ class Shareino extends Module
     {
         include(dirname(__FILE__) . '/sql/uninstall.php');
 
+        // Uninstall Tabs
+        $moduleTabs = Tab::getCollectionFromModule($this->name);
+        if (!empty($moduleTabs)) {
+            foreach ($moduleTabs as $moduleTab) {
+                $moduleTab->delete();
+            }
+        }
+
         return parent::uninstall();
     }
 
