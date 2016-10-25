@@ -66,12 +66,7 @@ class OrganizeCategories extends ObjectModel
         }
 
         $result = Db::getInstance()
-            ->insert($this->def['table'],
-                $this->getFields(),
-                $null_values,
-                true,
-                Db::REPLACE
-            );
+            ->insert($this->def['table'], $this->getFields(), $null_values, true, Db::REPLACE);
 
         if (!$result) {
             return false;
