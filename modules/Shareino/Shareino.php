@@ -82,6 +82,19 @@ class Shareino extends Module
         return parent::uninstall();
     }
 
+
+    /**
+     * Load the configuration form
+     */
+    public function getContent()
+    {
+        $this->context->smarty->assign('module_dir', $this->_path);
+
+        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+
+        return $output;
+    }
+
     public function hookActionProductDelete()
     {
         /* Place your code here. */
