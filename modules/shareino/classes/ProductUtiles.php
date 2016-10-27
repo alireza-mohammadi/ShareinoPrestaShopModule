@@ -172,7 +172,6 @@ class ProductUtiles
         $features = array();
         if (!Feature::isFeatureActive())
             return array();
-
         $features = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
                 SELECT name, value, pf.id_feature, liflv.url_name AS url
                 FROM ' . _DB_PREFIX_ . 'feature_product pf
@@ -184,8 +183,6 @@ class ProductUtiles
                 WHERE pf.id_product = ' . (int)$id_product . '
                 ORDER BY f.position ASC'
         );
-
-
         return $features;
     }
 
