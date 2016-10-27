@@ -40,7 +40,7 @@ class ProductUtiles
      */
     public function syncProduct($productIds)
     {
-
+        $products = array();
         $result = null;
         if (!is_array($productIds)) {
             $product = $this->getProductDetailById($productIds);
@@ -49,7 +49,7 @@ class ProductUtiles
             }
         } else {
             if (!empty($productIds)) {
-                $products = array();
+
                 foreach ($productIds as $id) {
                     $products[] = $this->getProductDetailById($id);
                 }
@@ -67,8 +67,7 @@ class ProductUtiles
         set_time_limit(0);
         $sync = new ShareinoSync();
 
-        if ($product_ids == null)
-            $product_ids = $sync->getProductsIds($ids);
+        $product_ids = $product_ids == null ? $sync->getProductsIds($ids) : $product_ids;
 
         if ($product_ids) {
             $split_ids = array_chunk($product_ids, 75);
@@ -111,7 +110,8 @@ class ProductUtiles
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
-            curl_setopt($curl, CURLOPT_HTTPHEADER,
+            curl_setopt($curl,
+                CURLOPT_HTTPHEADER,
                 array("Authorization:Bearer $SHAREINO_API_TOKEN")
             );
 
@@ -132,8 +132,9 @@ class ProductUtiles
                     $shsync = new ShareinoSync($this->context);
                     $shsync->product_id = $result["code"];
                     $shsync->status = $result["status"];
-                    if (isset($result["errors"]) & !empty($result["errors"]))
-                        $shsync->errors = implode(", ", $result["errors"]);
+
+                    $shsync->errors = isset($result["errors"]) & !empty($result["errors"]) ?
+                        implode(", ", $result["errors"]) : "";
                     $shsync->syncLocalField();
                 }
             }
@@ -172,8 +173,7 @@ class ProductUtiles
         $features = array();
         if (!Feature::isFeatureActive())
             return array();
-        $features = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-                SELECT name, value, pf.id_feature, liflv.url_name AS url
+        $query = 'SELECT name, value, pf.id_feature, liflv.url_name AS url
                 FROM ' . _DB_PREFIX_ . 'feature_product pf
                 LEFT JOIN ' . _DB_PREFIX_ . 'feature_lang fl ON (fl.id_feature = pf.id_feature AND fl.id_lang = ' . (int)$id_lang . ')
                 LEFT JOIN ' . _DB_PREFIX_ . 'feature_value_lang fvl ON (fvl.id_feature_value = pf.id_feature_value AND fvl.id_lang = ' . (int)$id_lang . ')
@@ -181,8 +181,8 @@ class ProductUtiles
                 LEFT JOIN ' . _DB_PREFIX_ . 'layered_indexable_feature_lang_value liflv ON (f.id_feature = liflv.id_feature AND liflv.id_lang = ' . (int)$id_lang . ')
                 ' . Shop::addSqlAssociation('feature', 'f') . '
                 WHERE pf.id_product = ' . (int)$id_product . '
-                ORDER BY f.position ASC'
-        );
+                ORDER BY f.position ASC';
+        $features = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
         return $features;
     }
 
@@ -236,8 +236,8 @@ class ProductUtiles
         $attributes = array();
         foreach ($features as $feature) {
             $slug = $feature["url"];
-            if ($slug == null && $slug == "")
-                $slug = Tools::strtolower($feature["name"]);
+            $slug = $slug == null && $slug == "" ?
+                Tools::strtolower($feature["name"]) : $slug;
             $attributes[$slug] = array(
                 "label" => $feature['name'],
                 "value" => $feature["value"]
