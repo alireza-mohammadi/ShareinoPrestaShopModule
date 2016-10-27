@@ -26,7 +26,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12">
-                    <form class="form-horizontal" action="{$url}" method="post">
+                    <form class="form-horizontal" action="{$url|escape:'htmlall':'UTF-8'}" method="post">
 
                         <div class="form-group">
                             <label for="inputPassword3" class="col-sm-2 control-label">Store Categorey :</label>
@@ -34,8 +34,8 @@
                                 <select class="dropdown store_categories cats_title  js-states form-control"
                                         style="width:100%;" name="store_cat">
                                     {foreach key=cid item=cat from=$categories}
-                                        <option value="{$cat.id_category}">
-                                            {$cat.name}
+                                        <option value="{$cat.id_category|escape:'htmlall':'UTF-8'}">
+                                            {$cat.name|escape:'htmlall':'UTF-8'}
                                         </option>
                                         {foreachelse}
                                         <option value="-1">could'nt load any things</option>
@@ -50,8 +50,8 @@
                                         name="shareino_cats[]"
                                         style="width:100%;">
                                     {foreach key=cid item=cat from=$shareinoCategories}
-                                        <option class="cats_title" value="{$cid}">
-                                            {$cat|replace:'--':'&nbsp;'}
+                                        <option class="cats_title" value="{$cid|escape:'htmlall':'UTF-8'}">
+                                            {$cat|replace:'--':'&nbsp;'|escape:'htmlall':'UTF-8'}
                                         </option>
                                         {foreachelse}
                                         <option value="-1">could'nt load any things</option>
