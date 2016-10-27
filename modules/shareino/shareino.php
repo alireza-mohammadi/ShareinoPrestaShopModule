@@ -204,7 +204,7 @@ class Shareino extends Module
 
         $tab = new Tab();
         // Need a foreach for the language
-        $tab->name[$this->context->language->id] = $this->l('ّهمسان سازی محصولات');
+        $tab->name[$this->context->language->id] = $this->l('همسان سازی محصولات');
         $tab->class_name = 'AdminSynchronize';
         $tab->id_parent = $parent_tab->id;
         $tab->module = $this->name;

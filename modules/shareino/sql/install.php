@@ -21,7 +21,7 @@
 
 $sql = array();
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `PREFIX_shareino_sync` (
+$sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_sync` (
   `id_shareino_sync` INT NOT NULL AUTO_INCREMENT,
   `product_id` INT NOT NULL,
   `status` TINYINT NULL,
@@ -31,11 +31,11 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `PREFIX_shareino_sync` (
   PRIMARY KEY (`id_shareino_sync`),
   UNIQUE INDEX `product_id_UNIQUE` (`product_id` ASC))DEFAULT CHARSET=utf8;';
 
-$sql[] = 'INSERT IGNORE INTO `PREFIX_shareino_sync` (`product_id`,`status`)
+$sql[] = 'INSERT IGNORE INTO  `'._DB_PREFIX_.'shareino_sync` (`product_id`,`status`)
             SELECT `id_product` AS `product_id`,0 AS `status`
-            from `PREFIX_product`;';
+            from  `'._DB_PREFIX_.'product`;';
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `PREFIX_shareino_organized` (
+$sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_organized` (
   `id_shareino_organized` int(11) NOT NULL AUTO_INCREMENT,
   `model` varchar(50) DEFAULT NULL,
   `cat_id` int(10) unsigned NOT NULL,
@@ -47,6 +47,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `PREFIX_shareino_organized` (
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
+        d($query);
         return false;
     }
 }
