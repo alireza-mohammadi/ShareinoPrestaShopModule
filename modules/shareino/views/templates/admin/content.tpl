@@ -90,7 +90,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12 text-center">
-            <img src="{$module_dir}shareino/views/img/logo.png" alt="" title="" style="margin-bottom: 20px;"/>
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/logo.png" alt="" title="" style="margin-bottom: 20px;"/>
         </div>
     </div>
 </div>
