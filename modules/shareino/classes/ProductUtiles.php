@@ -110,10 +110,7 @@ class ProductUtiles
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
-            curl_setopt($curl,
-                CURLOPT_HTTPHEADER,
-                array("Authorization:Bearer $SHAREINO_API_TOKEN")
-            );
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization:Bearer $SHAREINO_API_TOKEN"));
 
             return curl_exec($curl);
         }
