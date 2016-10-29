@@ -296,8 +296,9 @@ class ProductUtiles
             // check if want to delete multiple
             if (is_array($ids)) {
                 $body = array("type" => "selected", "code" => $ids);
-            } // if want to delete once
+            }
             else {
+                // if want to delete once
                 $url .= "/$ids";
             }
         }
