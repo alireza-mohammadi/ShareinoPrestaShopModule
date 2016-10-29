@@ -24,7 +24,6 @@ require_once(dirname(__FILE__) . '/../../classes/ProductUtiles.php');
 
 class AdminManageCatsController extends ModuleAdminController
 {
-
     public function __construct()
     {
         $this->module = 'shareino';
