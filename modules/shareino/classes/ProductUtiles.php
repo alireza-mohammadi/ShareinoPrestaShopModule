@@ -293,12 +293,11 @@ class ProductUtiles
         if ($all) {
             $body = array("type" => "all");
         } else {
-            // check if want to delete multiple
             if (is_array($ids)) {
                 $body = array("type" => "selected", "code" => $ids);
             }
-            else {
-                // if want to delete once
+            else
+            {
                 $url .= "/$ids";
             }
         }
