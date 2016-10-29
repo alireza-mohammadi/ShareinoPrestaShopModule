@@ -52,8 +52,9 @@ class ProductUtiles
             foreach ($productIds as $id) {
                 $products[] = $this->getProductDetailById($id);
             }
-            if (!empty($products))
+            if (!empty($products)) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
+            }
         }
         return $this->parsSyncResult($result, $productIds);
 
