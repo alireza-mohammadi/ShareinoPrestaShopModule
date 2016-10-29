@@ -202,10 +202,11 @@ class ProductUtiles
         $imagesPath = array();
         $link = new Link;//because getImageLInk is not static function
         foreach ($images as $image) {
-            if ($image["cover"])
+            if ($image["cover"]) {
                 $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
-            else
+            } else {
                 $imagesPath[] = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
+            }
         }
 
         // Get Variant
@@ -296,8 +297,9 @@ class ProductUtiles
             if (is_array($ids)) {
                 $body = array("type" => "selected", "code" => $ids);
             } // if want to delete once
-            else
+            else {
                 $url .= "/$ids";
+            }
         }
 
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));

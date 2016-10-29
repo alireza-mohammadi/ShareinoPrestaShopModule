@@ -114,8 +114,9 @@ class ShareinoSync extends ObjectModel
 
         $ids = array();
 
-        foreach ($product_ids as $pid)
+        foreach ($product_ids as $pid) {
             $ids[] = $pid["product_id"];
+        }
 
         return $ids;
 

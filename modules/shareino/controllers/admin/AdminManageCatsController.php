@@ -123,9 +123,8 @@ class AdminManageCatsController extends ModuleAdminController
         $this->context->smarty->assign('list', $this->renderList());
         $this->context->smarty->assign('form', $this->renderForm());
         $this->context->smarty->assign('categories', $storeCat);
-        $this->context->smarty->assign('shareinoCategories'
-            , isset($shareinoCategories["categories"]) ?
-                $shareinoCategories["categories"] : false);
+        $shareinoCategories = isset($shareinoCategories["categories"]) ? $shareinoCategories["categories"] : false;
+        $this->context->smarty->assign('shareinoCategories', $shareinoCategories);
         $link = new LinkCore();
         $action = $link->getAdminLink("AdminManageCats");
         $this->context->smarty->assign('url', $action);
@@ -144,3 +143,4 @@ class AdminManageCatsController extends ModuleAdminController
     }
 
 }
+
