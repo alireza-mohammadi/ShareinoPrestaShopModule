@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://dev.scommerce.ir//api/v1/public/";
+    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -262,6 +262,7 @@ class ProductUtiles
             "sku" => $product->reference,
 //            "price" => $price * $pricefactor,
             "price" => $price,
+            "active" => $product->active,
             "sale_price" => "",
             "discount" => "",
             "quantity" => Product::getQuantity($product->id),
@@ -295,9 +296,7 @@ class ProductUtiles
         } else {
             if (is_array($ids)) {
                 $body = array("type" => "selected", "code" => $ids);
-            }
-            else
-            {
+            } else {
                 $url .= "/$ids";
             }
         }

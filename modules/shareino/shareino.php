@@ -23,6 +23,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(dirname(__FILE__) . '/classes/ShareinoSync.php');
+require_once(dirname(__FILE__) . '/classes/ProductUtiles.php');
+
 class Shareino extends Module
 {
     protected $config_form = false;
@@ -59,10 +62,8 @@ class Shareino extends Module
         $this->installTabs();
 
         return parent::install() &&
-        $this->registerHook('header') &&
-        $this->registerHook('backOfficeHeader') &&
-        $this->registerHook('actionProductDelete') &&
         $this->registerHook('actionProductSave') &&
+        $this->registerHook('actionProductDelete') &&
         $this->registerHook('actionUpdateQuantity');
     }
 
@@ -172,19 +173,39 @@ class Shareino extends Module
         }
     }
 
-    public function hookActionProductDelete()
+    public function hookActionProductDelete($params)
     {
-        /* Place your code here. */
+        $product_id = $params["id_product"];
+        $productUtil = new ProductUtiles($this->context);
+        $result = $productUtil->deleteProducts($product_id);
+
+        if ($result["status"]) {
+            $sync = new ShareinoSync();
+            $sync->deleteProduct($product_id);
+        }
     }
 
-    public function hookActionProductSave()
+    public function hookActionProductSave($params)
     {
-        /* Place your code here. */
+
+        $product_id = $params["id_product"];
+
+        $productUtil = new ProductUtiles($this->context);
+        $product = $productUtil->getProductDetailById($product_id);
+
+        if ($product["active"]) {
+            echo $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
+            $productUtil->parsSyncResult($result, $product_id);
+        } else {
+            die("fuck Mahmood");
+        }
+
+
     }
 
-    public function hookActionUpdateQuantity()
+    public function hookActionUpdateQuantity($params)
     {
-        /* Place your code here. */
+        $this->hookActionProductSave($params);
     }
 
     /**
