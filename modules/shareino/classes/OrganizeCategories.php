@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2015-2016 Shareino
  *
@@ -18,7 +19,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
-
 class OrganizeCategories extends ObjectModel
 {
     public $id_shareino_categories;
@@ -102,6 +102,10 @@ class OrganizeCategories extends ObjectModel
 
         $categoriesIds = implode(",", $categoriesIds);
 
+        if ($categoriesIds == "") {
+            return array();
+        }
+        
         $query = "SELECT cat_id,ids from " . _DB_PREFIX_ .
             "shareino_organized WHERE cat_id in ($categoriesIds)";
 

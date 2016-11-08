@@ -84,6 +84,46 @@ class ProductUtiles
      * @param $method
      * @return mixed | null
      */
+//    public function sendRequset($url, $method, $body = null)
+//    {
+//
+//        // Init curl
+//        $curl = curl_init();
+//        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+//
+//        // Generate url and set method in url
+//        $url = self::SHAREINO_API_URL . $url;
+//        curl_setopt($curl, CURLOPT_URL, $url);
+//
+//        // Set method in curl
+//        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+//
+//        // Get token from site setting
+//        $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
+//
+//
+//        // Check if token has been set then send request to {@link http://shareino.com}
+//        if (!empty($SHAREINO_API_TOKEN)) {
+//
+//            // Set Body if its exist
+//            if ($body != null) {
+//                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+//            }
+//            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization:Bearer $SHAREINO_API_TOKEN"));
+//
+//            return curl_exec($curl);
+//        }
+//        return null;
+//    }
+
+    /**
+     * Called when need to send request to external server or site
+     *
+     * @param $url url address af Server
+     * @param $method
+     * @param null $body content of request like product
+     * @return mixed | null
+     */
     public function sendRequset($url, $method, $body = null)
     {
 
@@ -109,9 +149,27 @@ class ProductUtiles
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization:Bearer $SHAREINO_API_TOKEN"));
+//            curl_setopt($curl, CURLOPT_HEADER, true);    // we want headers
 
-            return curl_exec($curl);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                    "Authorization:Bearer $SHAREINO_API_TOKEN")
+            );
+
+            // Get result
+            $result = curl_exec($curl);;
+
+            // Get Header Response header
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+            if ($httpcode == 401 || $httpcode == 403) {
+                Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
+                return null;
+
+            }
+            return $result;
+        } else {
+            Tools::displayError("توکن وارد نشده است");
+            return null;
         }
         return null;
     }
@@ -119,9 +177,10 @@ class ProductUtiles
 
     public function parsSyncResult($results, $productIds = null)
     {
+
         $results = Tools::jsonDecode($results, true);
 
-        if ($this->checkAuth($results)) {
+        if ($results != null) {
             if (is_array($results)) {
 
                 foreach ($results as $result) {
@@ -137,21 +196,17 @@ class ProductUtiles
             return;
         } else {
 
-            if ($results["status"] == false) {
-                foreach ($productIds as $ids) {
-                    $shsync = new ShareinoSync($this->context);
-                    $shsync->product_id = $ids;
-                    $shsync->status = false;
-                    $shsync->errors = implode(", ", $results["messages"]);
-                    $shsync->syncLocalField();
-                }
+            foreach ($productIds as $ids) {
+                $shsync = new ShareinoSync($this->context);
+                $shsync->product_id = $ids;
+                $shsync->status = false;
+                $shsync->errors = implode(", ", $results["messages"]);
+                $shsync->syncLocalField();
             }
             return;
         }
+
         $this->setAllFailure($productIds);
-        //
-
-
     }
 
     public function setAllFailure($productIds)
@@ -301,19 +356,13 @@ class ProductUtiles
             }
         }
 
+        var_dump($body);
+        die;
+        
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
+
         return Tools::jsonDecode($result, true);
 
     }
 
-    public function checkAuth($input)
-    {
-        if (isset($input["status"]) & !$input["status"]) {
-            if (substr_compare($input["message"][0], "Invalid authorization token.") == 0) {
-                $this->context->cookie->__set('redirect_errors', Tools::displayError('Invalid Shareino authorization token.'));
-                return false;
-            }
-        }
-        return true;
-    }
 }

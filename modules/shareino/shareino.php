@@ -63,6 +63,7 @@ class Shareino extends Module
 
         return parent::install() &&
         $this->registerHook('actionProductSave') &&
+        $this->registerHook('actionProductUpdate') &&
         $this->registerHook('actionProductDelete') &&
         $this->registerHook('actionUpdateQuantity');
     }
@@ -177,12 +178,12 @@ class Shareino extends Module
     {
         $product_id = $params["id_product"];
         $productUtil = new ProductUtiles($this->context);
-        $result = $productUtil->deleteProducts($product_id);
 
-        if ($result["status"]) {
-            $sync = new ShareinoSync();
-            $sync->deleteProduct($product_id);
-        }
+        $productUtil->deleteProducts($product_id);
+
+        $sync = new ShareinoSync();
+        $sync->deleteProduct($product_id);
+
     }
 
     public function hookActionProductSave($params)
@@ -190,20 +191,28 @@ class Shareino extends Module
 
         $product_id = $params["id_product"];
 
+        var_dump($product_id);
+        die;
+        
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($product_id);
 
         if ($product["active"]) {
-            echo $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
+            $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
             $productUtil->parsSyncResult($result, $product_id);
         } else {
-            die("fuck Mahmood");
+            $productUtil->deleteProducts($product_id);
         }
 
-
+        return $params;
     }
 
     public function hookActionUpdateQuantity($params)
+    {
+        $this->hookActionProductSave($params);
+    }
+
+    public function hookActionProductUpdate($params)
     {
         $this->hookActionProductSave($params);
     }
