@@ -249,8 +249,7 @@ class ProductUtiles
     public function getProductDetail($product)
     {
 
-
-        // Get All images and covers
+        
         $images = Image::getImages($this->context->language->id, $product->id);
 
         $coverPath = "";
@@ -266,6 +265,7 @@ class ProductUtiles
 
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
+        
         $variations = array();
         $price = $product->getPrice();
         foreach ($vars as $var) {
@@ -278,6 +278,7 @@ class ProductUtiles
             );
 
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
+            $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
             $variations[$var["id_product_attribute"]]["price"] = $var["price"] <= 0 ? $price : $var["price"];
 
