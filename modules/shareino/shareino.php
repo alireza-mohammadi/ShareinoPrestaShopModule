@@ -188,8 +188,11 @@ class Shareino extends Module
     public function hookActionProductSave($params)
     {
 
+        if (!isset($params["product"]))
+            return true;
+
         $product_id = $params["id_product"];
-        
+
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($product_id);
 
@@ -208,10 +211,6 @@ class Shareino extends Module
         $this->hookActionProductSave($params);
     }
 
-    public function hookActionProductUpdate($params)
-    {
-        $this->hookActionProductSave($params);
-    }
 
     /**
      * Add Shareino tabs to Prestashop main menu
