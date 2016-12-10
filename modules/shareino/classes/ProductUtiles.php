@@ -151,8 +151,12 @@ class ProductUtiles
             }
 //            curl_setopt($curl, CURLOPT_HEADER, true);    // we want headers
 
+            $shareinoModule = Module::getInstanceByName('shareino');
+
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    "Authorization:Bearer $SHAREINO_API_TOKEN")
+                    "Authorization:Bearer 13$SHAREINO_API_TOKEN",
+                    "User-Agent:PrestaShop_Module_$shareinoModule->version"
+                )
             );
 
             // Get result
@@ -162,7 +166,9 @@ class ProductUtiles
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if ($httpcode == 401 || $httpcode == 403) {
+                
                 Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
+                $this->context->smarty->assign( 'error', 'fuck!' );
                 return null;
 
             }

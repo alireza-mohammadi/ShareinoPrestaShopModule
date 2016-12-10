@@ -191,8 +191,6 @@ class Shareino extends Module
 
         $product_id = $params["id_product"];
 
-        var_dump($product_id);
-        die;
         
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($product_id);
