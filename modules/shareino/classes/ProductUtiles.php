@@ -45,12 +45,15 @@ class ProductUtiles
         $result = null;
         if (!is_array($productIds)) {
             $product = $this->getProductDetailById($productIds);
-            if ($product) {
+            if ($product && $product != null) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($product));
             }
         } else {
             foreach ($productIds as $id) {
-                $products[] = $this->getProductDetailById($id);
+                $product = $this->getProductDetailById($id);
+                if ($product && $product != null) {
+                    $products[] = $product;
+                }
             }
             if (!empty($products)) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
@@ -150,7 +153,7 @@ class ProductUtiles
 
                 foreach ($results as $result) {
 
-                    if (!isset($result["code"]) | $result["code"]==null ) {
+                    if (!isset($result["code"]) | $result["code"] == null) {
                         continue;
                     }
                     $shsync = new ShareinoSync($this->context);
@@ -166,7 +169,7 @@ class ProductUtiles
         } else {
 
             foreach ($productIds as $ids) {
-                if (!isset($result["code"]) | $result["code"]==null ) {
+                if (!isset($result["code"]) | $result["code"] == null) {
                     continue;
                 }
                 $shsync = new ShareinoSync($this->context);
@@ -214,7 +217,9 @@ class ProductUtiles
     {
 
         $product = new Product($productId, false, $this->context->language->id);
-
+        if ($product->id == null) {
+            return null;
+        }
         return $this->getProductDetail($product);
     }
 
