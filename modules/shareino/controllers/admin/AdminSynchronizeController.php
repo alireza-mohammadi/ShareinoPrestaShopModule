@@ -20,17 +20,19 @@
  */
 
 require_once(dirname(__FILE__) . '/../../classes/ProductUtiles.php');
+
 class AdminSynchronizeController extends ModuleAdminController
 {
 
-
     public function __construct()
     {
+
         $this->module = 'shareino';
         $this->table = 'shareino_sync';
         $this->context = Context::getContext();
         $this->context->controller = $this;
         $this->bootstrap = true;
+        $this->lang = false;
 
         $this->context->controller->addJS('js/jquery/jquery-1.11.0.min.js', 'all');
         $this->context->controller->addJS('js/jquery/plugins/select2/jquery.select2.js', 'all');
@@ -49,6 +51,7 @@ class AdminSynchronizeController extends ModuleAdminController
             'date_upd' => array('title' => 'Date Update', 'type' => 'datetime', 'search' => false)
         );
 
+
         $this->addRowAction('aa');
         // Update the SQL request of the HelperList
         $this->_select = "pl.`name` as product_name";
@@ -65,6 +68,7 @@ class AdminSynchronizeController extends ModuleAdminController
 
         parent::__construct();
     }
+
 
     protected function processBulkSynchronizeAction()
     {
@@ -83,22 +87,57 @@ class AdminSynchronizeController extends ModuleAdminController
             $sync->changeProductsStatus($this->boxes, 0);
         }
     }
-    public function renderOptions()
+
+
+    public function createTemplate($tpl_name)
     {
-//        $link = new LinkCore();//because getImageLInk is not static function
+        if (file_exists($this->getTemplatePath() . $tpl_name) && $this->viewAccess()) {
+
+            return $this->context->smarty->createTemplate($this->getTemplatePath() . 'sync_content.tpl', $this->context->smarty);
+        }
+        return parent::createTemplate($tpl_name);
+    }
+
+    public function processConfiguration()
+    {
+
+        if (Tools::isSubmit('shareino_synchronize_all')) {
+            $productUtiles = new ProductUtiles($this->context);
+            $sync = new ShareinoSync();
+            $productIds = $sync->getProductsIds(null, true);
+
+            if ($productIds) {
+                $split_ids = array_chunk($productIds, 75);
+                foreach ($split_ids as $pIds) {
+                    $productUtiles->syncProduct($pIds);
+                }
+            }
+
+        }
+        $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
+
 
         $url = 'index.php?controller=AdminModules&configure=shareino';
         $url .= '&token=' . Tools::getAdminTokenLite('AdminModules');
-        $this->fields_options = array(
-            'test' => array(
 
-                'bottom' => '<div class="margin-form">
-					<a href="' . $url . '" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span>  Configuration</a>
-					<br />
-					</div>',
-            )
-        );
+        $this->context->smarty->assign('list', $this->renderList());
+        $this->context->smarty->assign('url', $url);
 
-        return parent::renderOptions();
+        $link = new LinkCore();
+        $action = $link->getAdminLink("AdminSynchronize");
+        $this->context->smarty->assign('actionUrl', $action);
     }
+
+    public function renderForm()
+    {
+        parent::renderForm();
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        $this->processConfiguration();
+        $this->context->smarty;
+    }
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2015-2016 Shareino
  *
@@ -18,7 +19,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
-
 class ShareinoSync extends ObjectModel
 {
     public $id_shareino_sync;
@@ -104,7 +104,11 @@ class ShareinoSync extends ObjectModel
 
     public function getProductsIds($ids, $all = false)
     {
-        $ids = implode(", ", $ids);
+        if ($ids != null) {
+            $ids = implode(", ", $ids);
+        } else {
+            $all = true;
+        }
 
         $query = "SELECT `product_id` from " . _DB_PREFIX_ . "shareino_sync";
 
