@@ -191,7 +191,12 @@ class Shareino extends Module
 
         $product_id = $params["id_product"];
 
-        
+        // When its delete action so call delete hook
+        if (!isset($params['product'])) {
+            $this->hookActionProductDelete($params);
+            return;
+        }
+
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($product_id);
 
@@ -212,6 +217,7 @@ class Shareino extends Module
 
     public function hookActionProductUpdate($params)
     {
+
         $this->hookActionProductSave($params);
     }
 
