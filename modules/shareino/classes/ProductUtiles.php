@@ -45,12 +45,15 @@ class ProductUtiles
         $result = null;
         if (!is_array($productIds)) {
             $product = $this->getProductDetailById($productIds);
-            if ($product) {
+            if ($product && $product != null) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($product));
             }
         } else {
             foreach ($productIds as $id) {
-                $products[] = $this->getProductDetailById($id);
+                $product = $this->getProductDetailById($id);
+                if ($product && $product != null) {
+                    $products[] = $product;
+                }
             }
             if (!empty($products)) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
@@ -86,7 +89,6 @@ class ProductUtiles
      */
     public function sendRequset($url, $method, $body = null)
     {
-
         // Init curl
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -144,13 +146,16 @@ class ProductUtiles
 
     public function parsSyncResult($results, $productIds = null)
     {
-
         $results = Tools::jsonDecode($results, true);
 
         if ($results != null) {
             if (is_array($results)) {
 
                 foreach ($results as $result) {
+
+                    if (!isset($result["code"]) | $result["code"] == null) {
+                        continue;
+                    }
                     $shsync = new ShareinoSync($this->context);
                     $shsync->product_id = $result["code"];
                     $shsync->status = $result["status"];
@@ -164,6 +169,9 @@ class ProductUtiles
         } else {
 
             foreach ($productIds as $ids) {
+                if (!isset($result["code"]) | $result["code"] == null) {
+                    continue;
+                }
                 $shsync = new ShareinoSync($this->context);
                 $shsync->product_id = $ids;
                 $shsync->status = false;
@@ -209,7 +217,11 @@ class ProductUtiles
     {
 
         $product = new Product($productId, false, $this->context->language->id);
-
+        if ($product->id == null) {
+            $shareinoSync = new ShareinoSync();
+            $shareinoSync->deleteProduct($productId);
+            return null;
+        }
         return $this->getProductDetail($product);
     }
 
