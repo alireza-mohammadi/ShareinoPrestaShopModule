@@ -323,9 +323,6 @@ class ProductUtiles
             }
         }
 
-        var_dump($body);
-        die;
-
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
 
         return Tools::jsonDecode($result, true);
