@@ -80,46 +80,6 @@ class ProductUtiles
      * Called when need to send request to external server or site
      *
      * @param $url url address af Server
-     * @param null $body content of request like product
-     * @param $method
-     * @return mixed | null
-     */
-//    public function sendRequset($url, $method, $body = null)
-//    {
-//
-//        // Init curl
-//        $curl = curl_init();
-//        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-//
-//        // Generate url and set method in url
-//        $url = self::SHAREINO_API_URL . $url;
-//        curl_setopt($curl, CURLOPT_URL, $url);
-//
-//        // Set method in curl
-//        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-//
-//        // Get token from site setting
-//        $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
-//
-//
-//        // Check if token has been set then send request to {@link http://shareino.com}
-//        if (!empty($SHAREINO_API_TOKEN)) {
-//
-//            // Set Body if its exist
-//            if ($body != null) {
-//                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
-//            }
-//            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization:Bearer $SHAREINO_API_TOKEN"));
-//
-//            return curl_exec($curl);
-//        }
-//        return null;
-//    }
-
-    /**
-     * Called when need to send request to external server or site
-     *
-     * @param $url url address af Server
      * @param $method
      * @param null $body content of request like product
      * @return mixed | null
@@ -154,7 +114,7 @@ class ProductUtiles
             $shareinoModule = Module::getInstanceByName('shareino');
 
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    "Authorization:Bearer 13$SHAREINO_API_TOKEN",
+                    "Authorization:Bearer $SHAREINO_API_TOKEN",
                     "User-Agent:PrestaShop_Module_$shareinoModule->version"
                 )
             );
@@ -162,13 +122,14 @@ class ProductUtiles
             // Get result
             $result = curl_exec($curl);;
 
+
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if ($httpcode == 401 || $httpcode == 403) {
-                
+
                 Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
-                $this->context->smarty->assign( 'error', 'fuck!' );
+                $this->context->smarty->assign('error', 'fuck!');
                 return null;
 
             }
@@ -273,7 +234,7 @@ class ProductUtiles
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
         $variations = array();
-        $price = $product->getPrice();
+        $price = $product->getPrice(false);
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
             $groupName = str_replace(" ", "_", $groupName);
@@ -364,7 +325,7 @@ class ProductUtiles
 
         var_dump($body);
         die;
-        
+
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
 
         return Tools::jsonDecode($result, true);
