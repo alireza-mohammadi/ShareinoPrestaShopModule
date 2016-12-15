@@ -218,6 +218,8 @@ class ProductUtiles
 
         $product = new Product($productId, false, $this->context->language->id);
         if ($product->id == null) {
+            $shareinoSync = new ShareinoSync();
+            $shareinoSync->deleteProduct($productId);
             return null;
         }
         return $this->getProductDetail($product);
