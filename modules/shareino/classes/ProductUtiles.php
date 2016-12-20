@@ -244,9 +244,10 @@ class ProductUtiles
 
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
-        
+
         $variations = array();
         $price = $product->getPrice(false);
+
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
             $groupName = str_replace(" ", "_", $groupName);
@@ -259,7 +260,7 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
-            $variations[$var["id_product_attribute"]]["price"] = $var["price"] <= 0 ? $price : $var["price"];
+            $variations[$var["id_product_attribute"]]["price"] = $var["price"]=== 0 ? $price : $price+$var["price"];
 
         }
 
@@ -283,11 +284,11 @@ class ProductUtiles
         $productCategories = OrganizeCategories::getShareinoids($categories);
 
         // Get All Convert Factor
-        $pricefactor = Configuration::get("SHAREINO_PRICE_FACTOR");
-        $weightFactor = Configuration::get("SHAREINO_WEIGHT_FACTOR");
-
-        $pricefactor = is_numeric($pricefactor) ? $pricefactor : 1;
-        $weightFactor = is_numeric($pricefactor) ? $weightFactor : 1;
+//        $pricefactor = Configuration::get("SHAREINO_PRICE_FACTOR");
+//        $weightFactor = Configuration::get("SHAREINO_WEIGHT_FACTOR");
+//
+//        $pricefactor = is_numeric($pricefactor) ? $pricefactor : 1;
+//        $weightFactor = is_numeric($pricefactor) ? $weightFactor : 1;
 
 
         $tags = $product->getTags($this->context->language->id);
