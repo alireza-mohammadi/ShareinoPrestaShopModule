@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://shareino.ir/api/v1/public/";
+    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -228,7 +228,7 @@ class ProductUtiles
     public function getProductDetail($product)
     {
 
-        
+
         $images = Image::getImages($this->context->language->id, $product->id);
 
         $coverPath = "";
@@ -245,8 +245,9 @@ class ProductUtiles
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
 
+
         $variations = array();
-        $price = $product->getPrice(false);
+        $price = $product->getPrice(false, NULL, 0);
 
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
@@ -260,7 +261,7 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
-            $variations[$var["id_product_attribute"]]["price"] = $var["price"]=== 0 ? $price : $price+$var["price"];
+            $variations[$var["id_product_attribute"]]["price"] = $var["price"] === 0 ? $price : $price + $var["price"];
 
         }
 
