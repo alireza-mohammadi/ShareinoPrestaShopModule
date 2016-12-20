@@ -100,12 +100,16 @@ class OrganizeCategories extends ObjectModel
                 = array($category["link_rewrite"] => $category["name"]);
         }
 
-        $categoriesIds = implode(",", $categoriesIds);
-
-        if ($categoriesIds == "") {
+        if (empty($categoriesIds)) {
             return array();
         }
-        
+
+        $categoriesIds = implode(",", $categoriesIds);
+
+        if (strlen($categoriesIds) <= 0) {
+            return array();
+        }
+
         $query = "SELECT cat_id,ids from " . _DB_PREFIX_ .
             "shareino_organized WHERE cat_id in ($categoriesIds)";
 
