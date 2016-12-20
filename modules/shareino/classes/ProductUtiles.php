@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
+    const SHAREINO_API_URL = "http://shareino.ir/api/v1/public/";
 
     public function __construct($context)
     {
