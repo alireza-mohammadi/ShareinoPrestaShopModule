@@ -204,7 +204,8 @@ class Shareino extends Module
 
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
-            $productUtil->parsSyncResult($result, $product_id);
+            if ($result !== null)
+                $this->parsSyncResult($result, $product_id);
         } else {
             $productUtil->deleteProducts($product_id);
         }

@@ -51,7 +51,7 @@ class ProductUtiles
         } else {
             foreach ($productIds as $id) {
                 $product = $this->getProductDetailById($id);
-                if ($product && $product != null) {
+                if ($product && $product != null && $product["active"]) {
                     $products[] = $product;
                 }
             }
@@ -59,7 +59,10 @@ class ProductUtiles
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
             }
         }
-        return $this->parsSyncResult($result, $productIds);
+        if ($result !== null)
+            return $this->parsSyncResult($result, $productIds);
+        else
+            return null;
 
 
     }
@@ -124,11 +127,10 @@ class ProductUtiles
             // Get result
             $result = curl_exec($curl);;
 
-
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if ($httpcode == 401 || $httpcode == 403) {
+            if ($httpcode === 401 || $httpcode === 403) {
 
                 Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
                 $this->context->smarty->assign('error', 'fuck!');
