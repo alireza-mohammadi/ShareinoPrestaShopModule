@@ -229,7 +229,11 @@ class ProductUtiles
 
     public function getProductDetail($product)
     {
-
+        // Check Availability of sell out of stock products
+        $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
+        $out_of_stock = $stockAvalible->out_of_stock;
+        if ($out_of_stock == 2)
+            $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
 
         $images = Image::getImages($this->context->language->id, $product->id);
 
@@ -307,6 +311,7 @@ class ProductUtiles
             "quantity" => Product::getQuantity($product->id),
 //            "weight" => $product->weight * $weightFactor,
             "weight" => $product->weight,
+            "available_for_order" => $product->available_for_order,
             "original_url" => $link->getProductLink($product),
             "brand_id" => "",
             "categories" => $productCategories,
@@ -318,6 +323,7 @@ class ProductUtiles
             "images" => $imagesPath,
             "attributes" => $attributes,
             "variants" => $variations,
+            "out_of_stock"=>$out_of_stock,
             "tags" => $tags
         );
 
