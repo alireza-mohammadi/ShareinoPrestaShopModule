@@ -299,6 +299,8 @@ class ProductUtiles
 
 
         $tags = $product->getTags($this->context->language->id);
+        $tags=explode(",",$tags);
+
         $product_detail = array(
             "name" => $product->name,
             "code" => $product->id,

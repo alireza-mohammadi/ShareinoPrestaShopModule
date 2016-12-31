@@ -1,0 +1,6 @@
+# Version 1.2.5
+Fix sending Tags => explode tags of product by ","  send it as an array
+# Version 1.2.4
+Add Capability  of sell out of stock product
+# Version 1.2.3
+Check active/deActive product before send to http://shareino.ir
