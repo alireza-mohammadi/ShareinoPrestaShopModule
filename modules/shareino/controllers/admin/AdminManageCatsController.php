@@ -78,55 +78,62 @@ class AdminManageCatsController extends ModuleAdminController
 
     public function processConfiguration()
     {
-        $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
-
-
-        // Get All Shareino categories
+//        $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
+//
+//
+//        // Get All Shareino categories
         $productUtil = new ProductUtiles($this->context);
-        $shareinoCategories = $productUtil->sendRequset("categories", "GET");
-
-
+        $shareinoCategories = $productUtil->sendRequset("categories?threaded=1", "GET");
+//
+//
         $shareinoCategories = Tools::jsonDecode($shareinoCategories, true);
-
-
-        if (Tools::isSubmit("organize_categories_submit")) {
-            $catId = Tools::getValue("store_cat");
-            $shareinoCats = Tools::getValue("shareino_cats");
-
-            if (is_numeric($catId) & $catId > 0) {
-
-                $orgCategories = new OrganizeCategories();
-                $orgCategories->cat_id = $catId;
-                $names = array();
-                if (isset($shareinoCategories["categories"])) {
-                    try {
-                        foreach ($shareinoCats as $id) {
-                            $names[] = str_replace("-- ", "", $shareinoCategories["categories"][$id]);
-                        }
-                    } catch (Exception $e) {
-                        //don nothing
-                    }
-                }
-                $orgCategories->ids = implode(",", $shareinoCats);
-                $orgCategories->names = implode(", ", $names);
-                $orgCategories->names = implode(", ", $names);
-                $orgCategories->add();
-
-            }
-        }
-
-        // Create List of categories and active options
-        $storeCat = CategoryCore::getCategories($this->context->language->id, true, false);
-
-
-        $this->context->smarty->assign('list', $this->renderList());
-        $this->context->smarty->assign('form', $this->renderForm());
-        $this->context->smarty->assign('categories', $storeCat);
+//
+//
+//        if (Tools::isSubmit("organize_categories_submit")) {
+//            $catId = Tools::getValue("store_cat");
+//            $shareinoCats = Tools::getValue("shareino_cats");
+//
+//            if (is_numeric($catId) & $catId > 0) {
+//
+//                $orgCategories = new OrganizeCategories();
+//                $orgCategories->cat_id = $catId;
+//                $names = array();
+//                if (isset($shareinoCategories["categories"])) {
+//                    try {
+//                        foreach ($shareinoCats as $id) {
+//                            $names[] = str_replace("-- ", "", $shareinoCategories["categories"][$id]);
+//                        }
+//                    } catch (Exception $e) {
+//                        //don nothing
+//                    }
+//                }
+//                $orgCategories->ids = implode(",", $shareinoCats);
+//                $orgCategories->names = implode(", ", $names);
+//                $orgCategories->names = implode(", ", $names);
+//                $orgCategories->add();
+//
+//            }
+//        }
+//
+//        // Create List of categories and active options
+//        $storeCat = CategoryCore::getCategories($this->context->language->id, true, false);
+//
+//
+//        $this->context->smarty->assign('list', $this->renderList());
+//        $this->context->smarty->assign('form', $this->renderForm());
+//        $this->context->smarty->assign('categories', $storeCat);
         $shareinoCategories = isset($shareinoCategories["categories"]) ? $shareinoCategories["categories"] : false;
-        $this->context->smarty->assign('shareinoCategories', $shareinoCategories);
-        $link = new LinkCore();
-        $action = $link->getAdminLink("AdminManageCats");
-        $this->context->smarty->assign('url', $action);
+//
+//
+
+        $traverse = $this->treeCategories($shareinoCategories, 0);
+//
+//
+//
+        $this->context->smarty->assign('shareinoCategories',$traverse);
+//        $link = new LinkCore();
+//        $action = $link->getAdminLink("AdminManageCats");
+//        $this->context->smarty->assign('url', $action);
     }
 
     public function renderForm()
@@ -139,6 +146,38 @@ class AdminManageCatsController extends ModuleAdminController
         parent::initContent();
         $this->processConfiguration();
         $this->context->smarty;
+    }
+
+    function treeCategories($pcategories, $level = 0)
+    {
+        if ($level === 0) {
+            $out = '<ul id="associated-categories-tree" class="cattree tree">';
+        } else {
+            $out = '<ul class="tree" style="">';
+        }
+
+        foreach ($pcategories as $category) {
+            if (!empty($category["children"])) {
+                $out .= '<li class="tree-folder"><span class="tree-folder-name">';
+                $out .= sprintf('<input type="checkbox" name="shareinoCategroris" value="%s">',$category['id']);
+                $out .= '<i class="icon-folder-close" style="padding: 5px;"></i>';
+                $out .= sprintf('<label class="tree-toggler" style="padding: 5px;">  %s  </label>',$category['name']);
+                $out .= '</span>';
+                $out .= $this->treeCategories($category["children"], $level + 1);
+            }
+            else{
+                $out .= '<li class="tree-item"><span class="tree-item-name">';
+                $out .= sprintf('<input type="checkbox" name="shareinoCategroris" value="%s">',$category['id']);
+                $out .= '<i class="tree-dot"></i>';
+                $out .= sprintf('<label class="tree-toggler"> %s </label>',$category['name']);
+                $out .= '</span>';
+            }
+            $out .= '</li>';
+        }
+
+        $out .= '</ul>';
+
+        return $out;
     }
 
 }
