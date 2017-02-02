@@ -21,12 +21,15 @@
     <div class="row">
         <div class="panel panel-body col-sm-12">
             <div class="row">
+                <div class="col-sm-12">
+                    <h2 class="text-center" style="padding: 10px;">
+                        برای معادل سازی دسته بندی ها یکی از دسته های فروشگاه خود و در مقابل دسته بندی معادل در سیستم شیراینو را انتخاب کنید
+                    </h2>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-sm-6">
-                    <div class="panel">
-                        <div class="panel-body" style="min-height: 250px; max-height: 250px; overflow-y: scroll;">
-                            Test
-                        </div>
-                    </div>
+                    {$storeCategoryBox}
                 </div>
 
                 <div class="col-sm-6">

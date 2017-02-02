@@ -86,7 +86,20 @@ class AdminManageCatsController extends ModuleAdminController
         $shareinoCategories = $productUtil->sendRequset("categories?threaded=1", "GET");
 //
 //
+        // Define Shareino's  Categories to use in layout
         $shareinoCategories = Tools::jsonDecode($shareinoCategories, true);
+        $shareinoCategories = isset($shareinoCategories["categories"]) ? $shareinoCategories["categories"] : false;
+        $traverse = $this->treeCategories($shareinoCategories, 0);
+        $this->context->smarty->assign('shareinoCategories', $traverse);
+
+        $tree = new HelperTreeCategories('associated-categories-tree', 'Associated categories');
+        $tree->setUseCheckBox(false);
+
+        $helper = new HelperCore();
+        $categoryTree = $helper->renderCategoryTree(null, array(), 'storeCategoryBox', true);
+        $this->context->smarty->assign('storeCategoryBox', $tree->render());
+
+
 //
 //
 //        if (Tools::isSubmit("organize_categories_submit")) {
@@ -116,21 +129,20 @@ class AdminManageCatsController extends ModuleAdminController
 //        }
 //
 //        // Create List of categories and active options
-//        $storeCat = CategoryCore::getCategories($this->context->language->id, true, false);
+//
 //
 //
 //        $this->context->smarty->assign('list', $this->renderList());
 //        $this->context->smarty->assign('form', $this->renderForm());
 //        $this->context->smarty->assign('categories', $storeCat);
-        $shareinoCategories = isset($shareinoCategories["categories"]) ? $shareinoCategories["categories"] : false;
 //
 //
 
-        $traverse = $this->treeCategories($shareinoCategories, 0);
+
 //
 //
 //
-        $this->context->smarty->assign('shareinoCategories',$traverse);
+
 //        $link = new LinkCore();
 //        $action = $link->getAdminLink("AdminManageCats");
 //        $this->context->smarty->assign('url', $action);
@@ -159,17 +171,16 @@ class AdminManageCatsController extends ModuleAdminController
         foreach ($pcategories as $category) {
             if (!empty($category["children"])) {
                 $out .= '<li class="tree-folder"><span class="tree-folder-name">';
-                $out .= sprintf('<input type="checkbox" name="shareinoCategroris" value="%s">',$category['id']);
+                $out .= sprintf('<input type="radio" name="shareinoCategroris" value="%s">', $category['id']);
                 $out .= '<i class="icon-folder-close" style="padding: 5px;"></i>';
-                $out .= sprintf('<label class="tree-toggler" style="padding: 5px;">  %s  </label>',$category['name']);
+                $out .= sprintf('<label class="tree-toggler" style="padding: 5px;">  %s  </label>', $category['name']);
                 $out .= '</span>';
                 $out .= $this->treeCategories($category["children"], $level + 1);
-            }
-            else{
+            } else {
                 $out .= '<li class="tree-item"><span class="tree-item-name">';
-                $out .= sprintf('<input type="checkbox" name="shareinoCategroris" value="%s">',$category['id']);
+                $out .= sprintf('<input type="radio" name="shareinoCategroris" value="%s">', $category['id']);
                 $out .= '<i class="tree-dot"></i>';
-                $out .= sprintf('<label class="tree-toggler"> %s </label>',$category['name']);
+                $out .= sprintf('<label class="tree-toggler"> %s </label>', $category['name']);
                 $out .= '</span>';
             }
             $out .= '</li>';
@@ -179,5 +190,6 @@ class AdminManageCatsController extends ModuleAdminController
 
         return $out;
     }
+
 
 }

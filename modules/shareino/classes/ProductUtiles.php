@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://shareino.ir/api/v1/public/";
+    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -109,7 +109,6 @@ class ProductUtiles
 
         // Check if token has been set then send request to {@link http://shareino.com}
         if (!empty($SHAREINO_API_TOKEN)) {
-
             // Set Body if its exist
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
@@ -253,7 +252,9 @@ class ProductUtiles
 
 
         $variations = array();
-        $price = $product->getPrice(false, NULL, 0);
+
+        echo "Price: ". $price =$product->getPriceWithoutReduct(false, NULL);
+        die;
 
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
@@ -299,7 +300,7 @@ class ProductUtiles
 
 
         $tags = $product->getTags($this->context->language->id);
-        $tags=explode(",",$tags);
+        $tags = explode(",", $tags);
 
         $product_detail = array(
             "name" => $product->name,
@@ -325,7 +326,7 @@ class ProductUtiles
             "images" => $imagesPath,
             "attributes" => $attributes,
             "variants" => $variations,
-            "out_of_stock"=>$out_of_stock,
+            "out_of_stock" => $out_of_stock,
             "tags" => $tags
         );
 
