@@ -124,8 +124,7 @@ class ProductUtiles
             );
 
             // Get result
-           echo  $result = curl_exec($curl);
-           die;
+            $result = curl_exec($curl);
 
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
