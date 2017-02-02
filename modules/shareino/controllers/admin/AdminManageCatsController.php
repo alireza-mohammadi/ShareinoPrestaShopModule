@@ -78,27 +78,30 @@ class AdminManageCatsController extends ModuleAdminController
 
     public function processConfiguration()
     {
-//        $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
-//
-//
-//        // Get All Shareino categories
+        // Assign module dir
+        $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
+
+        // Get All Shareino categories
         $productUtil = new ProductUtiles($this->context);
         $shareinoCategories = $productUtil->sendRequset("categories?threaded=1", "GET");
-//
-//
-        // Define Shareino's  Categories to use in layout
+
+        // Assign Shareino's  Categories to use in layout
         $shareinoCategories = Tools::jsonDecode($shareinoCategories, true);
         $shareinoCategories = isset($shareinoCategories["categories"]) ? $shareinoCategories["categories"] : false;
         $traverse = $this->treeCategories($shareinoCategories, 0);
         $this->context->smarty->assign('shareinoCategories', $traverse);
 
-        $tree = new HelperTreeCategories('associated-categories-tree', 'Associated categories');
+        // Assign Store's categories
+        $tree = new HelperTreeCategories('associated-categories-tree', 'دسته بندی های فروشگاه');
         $tree->setUseCheckBox(false);
-
-        $helper = new HelperCore();
-        $categoryTree = $helper->renderCategoryTree(null, array(), 'storeCategoryBox', true);
         $this->context->smarty->assign('storeCategoryBox', $tree->render());
 
+        // Assign controller's url
+        $link = new LinkCore();
+        $action = $link->getAdminLink("AdminManageCats");
+        $this->context->smarty->assign('url', $action);
+
+        $this->context->smarty->assign('list', $this->renderList());
 
 //
 //
@@ -129,23 +132,8 @@ class AdminManageCatsController extends ModuleAdminController
 //        }
 //
 //        // Create List of categories and active options
-//
-//
-//
-//        $this->context->smarty->assign('list', $this->renderList());
-//        $this->context->smarty->assign('form', $this->renderForm());
-//        $this->context->smarty->assign('categories', $storeCat);
-//
-//
 
 
-//
-//
-//
-
-//        $link = new LinkCore();
-//        $action = $link->getAdminLink("AdminManageCats");
-//        $this->context->smarty->assign('url', $action);
     }
 
     public function renderForm()
