@@ -124,7 +124,8 @@ class ProductUtiles
             );
 
             // Get result
-            $result = curl_exec($curl);;
+           echo  $result = curl_exec($curl);
+           die;
 
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -253,8 +254,7 @@ class ProductUtiles
 
         $variations = array();
 
-        echo "Price: ". $price =$product->getPriceWithoutReduct(false, NULL);
-        die;
+        $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false,0);
 
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
@@ -291,14 +291,6 @@ class ProductUtiles
 
         $productCategories = OrganizeCategories::getShareinoids($categories);
 
-        // Get All Convert Factor
-//        $pricefactor = Configuration::get("SHAREINO_PRICE_FACTOR");
-//        $weightFactor = Configuration::get("SHAREINO_WEIGHT_FACTOR");
-//
-//        $pricefactor = is_numeric($pricefactor) ? $pricefactor : 1;
-//        $weightFactor = is_numeric($pricefactor) ? $weightFactor : 1;
-
-
         $tags = $product->getTags($this->context->language->id);
         $tags = explode(",", $tags);
 
@@ -306,13 +298,11 @@ class ProductUtiles
             "name" => $product->name,
             "code" => $product->id,
             "sku" => $product->reference,
-//            "price" => $price * $pricefactor,
             "price" => $price,
             "active" => $product->active,
             "sale_price" => "",
             "discount" => "",
             "quantity" => Product::getQuantity($product->id),
-//            "weight" => $product->weight * $weightFactor,
             "weight" => $product->weight,
             "available_for_order" => $product->available_for_order,
             "original_url" => $link->getProductLink($product),
