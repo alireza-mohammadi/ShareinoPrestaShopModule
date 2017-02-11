@@ -62,9 +62,9 @@ class Shareino extends Module
         $this->installTabs();
 
         return parent::install() &&
-        $this->registerHook('actionProductDelete') &&
-        $this->registerHook('actionProductSave') &&
-        $this->registerHook('actionUpdateQuantity');
+            $this->registerHook('actionProductDelete') &&
+            $this->registerHook('actionProductSave') &&
+            $this->registerHook('actionUpdateQuantity');
     }
 
     public function uninstall()
@@ -206,8 +206,6 @@ class Shareino extends Module
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
             if ($result !== null)
                 $productUtil->parsSyncResult($result, $product_id);
-        } else {
-            $productUtil->deleteProducts($product_id);
         }
 
         return $params;
