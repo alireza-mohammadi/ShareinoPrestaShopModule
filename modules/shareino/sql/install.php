@@ -47,7 +47,6 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_organized` (
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
-        d($query);
         return false;
     }
 }
