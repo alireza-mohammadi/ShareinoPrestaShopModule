@@ -100,8 +100,9 @@ class AdminSynchronizeController extends ModuleAdminController
 
     public function processConfiguration()
     {
-
         if (Tools::isSubmit('shareino_synchronize_all')) {
+
+
             $productUtiles = new ProductUtiles($this->context);
             $sync = new ShareinoSync();
             $productIds = $sync->getProductsIds(null, true);
@@ -123,9 +124,18 @@ class AdminSynchronizeController extends ModuleAdminController
         $this->context->smarty->assign('list', $this->renderList());
         $this->context->smarty->assign('url', $url);
 
+        $this->context->smarty->assign(array(
+            'token' => Tools::getAdminTokenLite('AdminSynchronize')
+        ));
+
         $link = new LinkCore();
         $action = $link->getAdminLink("AdminSynchronize");
         $this->context->smarty->assign('actionUrl', $action);
+
+
+        $sync = new ShareinoSync();
+        $productIds = $sync->getProductsIds(null, true);
+        $this->context->smarty->assign('productIDs',$productIds);
     }
 
     public function renderForm()
@@ -138,6 +148,15 @@ class AdminSynchronizeController extends ModuleAdminController
         parent::initContent();
         $this->processConfiguration();
         $this->context->smarty;
+    }
+
+
+    function ajaxProcessSyncProducts()
+    {
+        echo json_encode(array(
+            'success' => true,
+            'received_data' => Tools::getValue('foo')
+        ));
     }
 
 }
