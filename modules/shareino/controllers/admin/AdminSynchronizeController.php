@@ -59,10 +59,7 @@ class AdminSynchronizeController extends ModuleAdminController
 // Add bulk actions
         $this->bulk_actions = array(
             'synchronizeAction' => array(
-                'text' => $this->l('Synchronize'), 'confirm' => $this->l('Are you sure?'),
-            ),
-            'deleteAction' => array(
-                'text' => $this->l('Delete From Shareino'), 'confirm' => $this->l('Are you sure?'),
+                'text' => $this->l('همسان سازی'), 'confirm' => $this->l('Are you sure?'),
             )
         );
 
@@ -75,19 +72,6 @@ class AdminSynchronizeController extends ModuleAdminController
         $productUtiles = new ProductUtiles($this->context);
         $productUtiles->bulkSync($this->boxes);
     }
-
-    protected function processBulkDeleteAction()
-    {
-        $productUtiles = new ProductUtiles($this->context);
-        $sync = new ShareinoSync();
-        $productIds = $sync->getProductsIds($this->boxes);
-
-        $productUtiles->deleteProducts($productIds);
-        if ($productIds) {
-            $sync->changeProductsStatus($this->boxes, 0);
-        }
-    }
-
 
     public function createTemplate($tpl_name)
     {
