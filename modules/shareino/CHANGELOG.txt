@@ -1,3 +1,5 @@
+# Version 1.2.6
+show errors on sync products , send request by ajax , redesign organize categories page
 # Version 1.2.5
 Fix sending Tags => explode tags of product by ","  send it as an array
 # Version 1.2.4

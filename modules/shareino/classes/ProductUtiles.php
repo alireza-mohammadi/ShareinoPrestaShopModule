@@ -57,10 +57,12 @@ class ProductUtiles
             }
             if (!empty($products)) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
+                if ($result["status"])
+                    $this->parsSyncResult($result["status"], $productIds);
             }
         }
         if ($result !== null)
-            return $this->parsSyncResult($result, $productIds);
+            return $result;
         else
             return null;
 
@@ -116,7 +118,6 @@ class ProductUtiles
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
-//            curl_setopt($curl, CURLOPT_HEADER, true);    // we want headers
 
             $shareinoModule = Module::getInstanceByName('shareino');
 
@@ -134,17 +135,23 @@ class ProductUtiles
 
             if ($httpcode === 401 || $httpcode === 403) {
 
-                Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
-                $this->context->smarty->assign('error', 'fuck!');
-                return null;
+                return array("status" => false,
+                    "code" => $httpcode,
+                    "data" => "خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
 
             }
-            return $result;
+            return array("status" => true,
+                "code" => $httpcode,
+                "data" => $result);
         } else {
-            Tools::displayError("توکن وارد نشده است");
-            return null;
+            return array("status" => false,
+                "code" => 404,
+                "data" => "توکن یافت نشد");
         }
-        return null;
+
+        return array("status" => false,
+            "code" => 500,
+            "data" => "عملیات با خطا مواجه شد لطفا مجدد تلاش فرمایید");
     }
 
 

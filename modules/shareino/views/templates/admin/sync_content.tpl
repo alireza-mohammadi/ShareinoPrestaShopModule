@@ -1,3 +1,8 @@
+<div class="alert alert-dismissible" id="syncMessageBox" role="alert" hidden>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+    </button>
+    <p id="syncMessageText"></p>
+</div>
 <div class="panel col-xs-12">
     <div class="panel-heading">
         عملیات
@@ -22,12 +27,18 @@
 
                     </form>
                     <br/>
-                    <div class="progress" hidden>
-                        <div class="progress-bar progress-bar-striped active"
-                             id="sync-progress"
-                             role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
+
+
+                    <div class="text-center" id="progress" hidden>
+                        <p class="label label-default" id="progressText"></p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped active"
+                                 id="sync-progress"
+                                 role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
+                            </div>
                         </div>
                     </div>
+
 
                 </div>
             </div>
@@ -45,63 +56,64 @@
         var productIDs ={$productIDs|json_encode};
 
         var lenght = productIDs.length;
-
         var stop = false;
         var submitProgress = $("#sync-progress");
-        var step = 0,
-            chunk = 75;
+        var progressText = $("#progressText");
+        var chunk = 50;
 
         var token = $("#syncAllProductsForm").attr('data-token');
+        var messageBox = $("#syncMessageBox");
+        var messageText = $("#syncMessageText");
+        var syncFrom = $("#syncAllProductsForm");
+        var submitBtn = $("#syncSumblit");
 
-        $("#syncAllProductsForm").on("submit", function (event) {
+        syncFrom.on("submit", function (event) {
 
             // Cancel Submit
             event.preventDefault();
 
-            var $this = $(this);
-            console.log($this.attr('action'));
+            productIDs = {$productIDs|json_encode};
+            lenght = productIDs.length;
 
-            operation = $this.attr("data-operation");
+            operation = syncFrom.attr("data-operation");
 
-            var submitBtn = $("#syncSumblit");
 
             submitProgress.show();
-            var i, j, slices;
 
             if (operation == "start") {
 
                 submitBtn.html("انصراف");
-                $this.attr("data-operation", "stop");
-
-                $(".progress").show(500);
+                syncFrom.attr("data-operation", "stop");
+                stop = false;
+                $("#progress").show(500);
                 setPercentage();
 
 
             }
             else if (operation == "stop") {
-
-                submitBtn.html("همسان سازی همه");
-                $this.attr("data-operation", "start");
-
-                submitProgress.css("width", "0%")
-                    .attr("aria-valuemin", "0%");
-                $(".progress").hide(500);
-
-                stop = true;
-                lenght = productIDs.length;
+                stopSync();
             }
 
             SyncProducts();
 
-            l("finish");
 
         });
 
 
         function SyncProducts() {
-            if (!stop && productIDs.length > 0) {
 
-                IDs = productIDs.splice(0, chunk);
+            console.log(productIDs.length);
+
+            if (productIDs.length <= 0) {
+                messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
+                messageBox.show(500);
+                messageBox.addClass('alert-success');
+                submitBtn.html("همسان سازی همه");
+                return;
+            }
+
+            if (!stop) {
+                var IDs = productIDs.splice(0, chunk);
 
                 $.ajax({
                     type: 'POST',
@@ -116,27 +128,34 @@
 
                         ids: IDs
                     },
-                })
-                    .done(function () {
-                        step++;
-                        l(step);
+                }).done(function (data) {
+                    if (data.status) {
                         setPercentage();
                         SyncProducts();
+                    }
+                    else {
+                        messageText.html(data.data);
+                        messageBox.show(500);
+                        messageBox.addClass("alert-danger");
+                        stop();
+                    }
+                }).fail(function () {
 
-                    })
-                    .fail(function () {
+                });
 
-                    });
             }
         }
 
         function setPercentage() {
 
-            var percentage = Math.round(((step * chunk) * 100) / lenght);
+            var percentage = Math.round(((lenght-productIDs.length) * 100) / lenght);
 
 
             percentage = percentage > 100 ? 100 : percentage;
 
+            var text = " تعداد " + (lenght-productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
+
+            progressText.html(text)
             submitProgress
                 .css("width", percentage + "%")
                 .attr("aria-valuemin", percentage + "%")
@@ -145,6 +164,19 @@
 
         function l(log) {
             console.log(log);
+        }
+
+        function stopSync() {
+
+            submitBtn.html("همسان سازی همه");
+            syncFrom.attr("data-operation", "start");
+
+            submitProgress.css("width", "0%")
+            submitProgress.css("width", "0%")
+                .attr("aria-valuemin", "0%");
+            $("#progress").hide(500);
+            stop = true;
+            lenght = productIDs.length;
         }
     });
 </script>

@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.2.5';
+        $this->version = '1.2.6';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -204,8 +204,8 @@ class Shareino extends Module
 
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
-            if ($result !== null)
-                $productUtil->parsSyncResult($result, $product_id);
+            if ($result["status"])
+                $productUtil->parsSyncResult($result["data"], $product_id);
         }
 
         return $params;

@@ -135,7 +135,7 @@ class AdminSynchronizeController extends ModuleAdminController
 
         $sync = new ShareinoSync();
         $productIds = $sync->getProductsIds(null, true);
-        $this->context->smarty->assign('productIDs',$productIds);
+        $this->context->smarty->assign('productIDs', $productIds);
     }
 
     public function renderForm()
@@ -150,13 +150,12 @@ class AdminSynchronizeController extends ModuleAdminController
         $this->context->smarty;
     }
 
-
     function ajaxProcessSyncProducts()
     {
-        echo json_encode(array(
-            'success' => true,
-            'received_data' => Tools::getValue('foo')
-        ));
+        $productUtiles = new ProductUtiles($this->context);
+        $ids = Tools::getValue('ids');
+        ob_start();
+        echo Tools::jsonEncode($productUtiles->syncProduct($ids));
     }
 
 }
