@@ -92,7 +92,7 @@ class ProductUtiles
      * @param null $body content of request like product
      * @return mixed | null
      */
-    public function sendRequset($url, $method, $body = null)
+    public function  sendRequset($url, $method, $body = null)
     {
 
 
@@ -102,6 +102,7 @@ class ProductUtiles
 
         // Generate url and set method in url
         $url = self::SHAREINO_API_URL . $url;
+
         curl_setopt($curl, CURLOPT_URL, $url);
 
         // Set method in curl
@@ -133,16 +134,21 @@ class ProductUtiles
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if ($httpcode === 401 || $httpcode === 403) {
-
+            if ($httpcode === 200) {
+                return array("status" => true,
+                    "code" => $httpcode,
+                    "data" => Tools::jsonDecode($result, true));
+            } else if ($httpcode === 401 || $httpcode === 403) {
                 return array("status" => false,
                     "code" => $httpcode,
                     "data" => "خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
-
+            } else {
+                $json=Tools::jsonDecode($result,true);
+                return array("status" => $json["status"],
+                    "code" => $httpcode,
+                    "data" => $json["message"]);
             }
-            return array("status" => true,
-                "code" => $httpcode,
-                "data" => $result);
+
         } else {
             return array("status" => false,
                 "code" => 404,
