@@ -20,7 +20,7 @@
  */
 if (!defined('_PS_VERSION_'))
     exit;
-function upgrade_module_1_2_7()
+function upgrade_module_1_2_8()
 {
     return true;
 }
