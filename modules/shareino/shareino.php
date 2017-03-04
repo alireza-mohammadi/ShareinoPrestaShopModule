@@ -187,10 +187,6 @@ class Shareino extends Module
 
     public function hookActionProductSave($params)
     {
-
-        if (!isset($params["product"]))
-            return true;
-
         $product_id = $params["id_product"];
 
         // When its delete action so call delete hook
@@ -213,7 +209,23 @@ class Shareino extends Module
 
     public function hookActionUpdateQuantity($params)
     {
-        $this->hookActionProductSave($params);
+        if (!isset($params['id_product']))
+            return true;
+
+        $productUtil = new ProductUtiles($this->context);
+        $product = $productUtil->getProductDetailById($params['id_product']);
+
+        if($product){
+            if(isset($product['variants'][$params['id_product_attribute']]))
+                $product['variants'][$params['id_product_attribute']]=$params['quantity'];
+        }
+
+        if ($product["active"]) {
+            $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
+            if ($result["status"])
+                $productUtil->parsSyncResult($result["data"], $params['id_product']);
+        }
+
     }
 
     public function hookActionProductUpdate($params)
