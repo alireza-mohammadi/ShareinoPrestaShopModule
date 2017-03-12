@@ -15,19 +15,24 @@
                     <form class="" action="{$actionUrl}" method="post" id="syncAllProductsForm" data-token='{$token}'
                           data-operation="start">
 
-                        <button type="submit" class="btn btn-default" name="shareino_synchronize_all" id="syncSumblit">
-                            <span class="glyphicon glyphicon-send" aria-hidden="true" style="display: inline;"></span>
-
-                            همسان سازی همه
-                        </button>
                         <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
                                     class="glyphicon glyphicon-cog"></span>
                             تنظیمات ماژول</a>
-
-
+                        <button type="button" class="btn btn-default" name="shareino_send_categories" id="sendCatsBtn">
+                            <span class="glyphicon glyphicon-send" aria-hidden="true" style="display: inline;"></span>
+                            ارسال تمامی دسته بندی ها
+                        </button>
+                        <button type="submit" class="btn btn-default" name="shareino_synchronize_all" id="syncSumblit">
+                            <span class="glyphicon glyphicon-send" aria-hidden="true" style="display: inline;"></span>
+                            همسان سازی همه
+                        </button>
                     </form>
-                    <br/>
 
+
+                    <div id="loadingBox" hidden class="text-center"><img
+                                src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
+                                alt="" title=""/>
+                    </div>
 
                     <div class="text-center" id="progress" hidden>
                         <p class="label label-default" id="progressText"></p>
@@ -66,6 +71,41 @@
         var messageText = $("#syncMessageText");
         var syncFrom = $("#syncAllProductsForm");
         var submitBtn = $("#syncSumblit");
+
+        $("#sendCatsBtn").on('click', function () {
+
+            $("#loadingBox").show();
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: 'ajax-tab.php',
+                data: {
+                    //required parameters
+                    ajax: true,
+                    controller: 'AdminSynchronize',
+                    action: 'SendCats',
+                    token: token,
+                },
+            }).done(function (data) {
+                if (data.status) {
+                    $("#loadingBox").hide();
+                    messageBox.addClass("alert-success");
+                    messageText.html("تمامی دسته بندی ها با موفقیت ارسال شدند");
+                    messageBox.show(500);
+                }
+                else {
+                    $("#loadingBox").hidden();
+                    messageText.html(data.data);
+                    messageBox.show(500);
+                    messageBox.addClass("alert-danger");
+                    stop();
+                }
+            }).fail(function () {
+
+            });
+
+        });
 
         syncFrom.on("submit", function (event) {
 
@@ -148,12 +188,12 @@
 
         function setPercentage() {
 
-            var percentage = Math.round(((lenght-productIDs.length) * 100) / lenght);
+            var percentage = Math.round(((lenght - productIDs.length) * 100) / lenght);
 
 
             percentage = percentage > 100 ? 100 : percentage;
 
-            var text = " تعداد " + (lenght-productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
+            var text = " تعداد " + (lenght - productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
 
             progressText.html(text)
             submitProgress

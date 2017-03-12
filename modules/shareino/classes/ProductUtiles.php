@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://shareino.ir/api/v1/public/";
+    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -107,6 +107,8 @@ class ProductUtiles
 
         // Set method in curl
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 
         // Get token from site setting
         $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");

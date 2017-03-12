@@ -84,21 +84,6 @@ class AdminSynchronizeController extends ModuleAdminController
 
     public function processConfiguration()
     {
-        if (Tools::isSubmit('shareino_synchronize_all')) {
-
-
-            $productUtiles = new ProductUtiles($this->context);
-            $sync = new ShareinoSync();
-            $productIds = $sync->getProductsIds(null, true);
-
-            if ($productIds) {
-                $split_ids = array_chunk($productIds, 75);
-                foreach ($split_ids as $pIds) {
-                    $productUtiles->syncProduct($pIds);
-                }
-            }
-
-        }
         $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
 
 
@@ -140,6 +125,28 @@ class AdminSynchronizeController extends ModuleAdminController
         $ids = Tools::getValue('ids');
         ob_start();
         echo Tools::jsonEncode($productUtiles->syncProduct($ids));
+    }
+
+    function ajaxProcessSendCats()
+    {
+        $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
+        $output = array();
+        $this->treeCategories($categories, $output);
+        $productUtiles = new ProductUtiles($this->context);
+        echo Tools::jsonEncode($productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output)));
+    }
+
+    function treeCategories($pcategories, &$outPut)
+    {
+        foreach ($pcategories as $category) {
+            $outPut[] = array("id" => $category["id_category"],
+                "parent_id" => $category["id_parent"],
+                "name" => $category["name"],
+                "link_rewrite" => $category["link_rewrite"],
+            );
+            if (isset($category) & !empty($category['children']))
+                $this->treeCategories($category['children'], $outPut);
+        }
     }
 
 }

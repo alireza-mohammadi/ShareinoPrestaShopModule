@@ -64,7 +64,10 @@ class Shareino extends Module
         return parent::install() &&
             $this->registerHook('actionProductDelete') &&
             $this->registerHook('actionProductSave') &&
-            $this->registerHook('actionUpdateQuantity');
+            $this->registerHook('actionUpdateQuantity') &&
+            $this->registerHook('actionCategoryAdd') &&
+            $this->registerHook('actionObjectCategoryUpdateAfter') &&
+            $this->registerHook('actionObjectCategoryDeleteAfter');
     }
 
     public function uninstall()
@@ -173,6 +176,42 @@ class Shareino extends Module
         }
     }
 
+    public function hookactionCategoryAdd($params)
+    {
+        if (isset($params['category']) && !empty($params['category'])) {
+
+            $category = array("id" => $params['category']->id,
+                "parent_id" => $params['category']->id_parent,
+                "name" => $params['category']->name[$this->context->language->id],
+            );
+
+            $productUtiles = new ProductUtiles($this->context);
+            $productUtiles->sendRequset("categories", "POST", Tools::jsonEncode($category));
+        }
+    }
+
+    public function hookactionObjectCategoryUpdateAfter($params)
+    {
+        if (isset($params['object']) && !empty($params['object'])) {
+            $category = array("id" => $params['object']->id_category,
+                "parent_id" => $params['object']->id_parent,
+                "name" => $params['object']->name[$this->context->language->id],
+            );
+            $productUtiles = new ProductUtiles($this->context);
+            $productUtiles->sendRequset("categories", "POST", Tools::jsonEncode($category));
+        }
+    }
+
+    public function hookactionObjectCategoryDeleteAfter($params)
+    {
+        $outPut[] = array("id" => $category["id_category"],
+            "parent_id" => $category["id_parent"],
+            "name" => $category["name"],
+            "link_rewrite" => $category["link_rewrite"],
+        );
+
+    }
+
     public function hookActionProductDelete($params)
     {
         $product_id = $params["id_product"];
@@ -215,9 +254,9 @@ class Shareino extends Module
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($params['id_product']);
 
-        if($product){
-            if(isset($product['variants'][$params['id_product_attribute']]))
-                $product['variants'][$params['id_product_attribute']]=$params['quantity'];
+        if ($product) {
+            if (isset($product['variants'][$params['id_product_attribute']]))
+                $product['variants'][$params['id_product_attribute']] = $params['quantity'];
         }
 
         if ($product["active"]) {
