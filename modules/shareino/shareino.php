@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.2.8';
+        $this->version = '1.2.9';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -67,7 +67,7 @@ class Shareino extends Module
             $this->registerHook('actionUpdateQuantity') &&
             $this->registerHook('actionCategoryAdd') &&
             $this->registerHook('actionObjectCategoryUpdateAfter') &&
-            $this->registerHook('actionObjectCategoryDeleteAfter');
+            $this->registerHook('actionCategoryDelete');
     }
 
     public function uninstall()
@@ -176,7 +176,7 @@ class Shareino extends Module
         }
     }
 
-    public function hookactionCategoryAdd($params)
+    public function hookActionCategoryAdd($params)
     {
         if (isset($params['category']) && !empty($params['category'])) {
 
@@ -190,7 +190,7 @@ class Shareino extends Module
         }
     }
 
-    public function hookactionObjectCategoryUpdateAfter($params)
+    public function hookActionObjectCategoryUpdateAfter($params)
     {
         if (isset($params['object']) && !empty($params['object'])) {
             $category = array("id" => $params['object']->id_category,
@@ -202,13 +202,8 @@ class Shareino extends Module
         }
     }
 
-    public function hookactionObjectCategoryDeleteAfter($params)
+    public function hookActionObjectCategoryDeleteAfter($params)
     {
-        $outPut[] = array("id" => $category["id_category"],
-            "parent_id" => $category["id_parent"],
-            "name" => $category["name"],
-            "link_rewrite" => $category["link_rewrite"],
-        );
 
     }
 

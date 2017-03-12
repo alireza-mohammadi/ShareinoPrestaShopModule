@@ -305,9 +305,7 @@ class ProductUtiles
         }
 
         // Get All Categories
-        $categories = Product::getProductCategoriesFull($product->id, $this->context->language->id);
-
-        $productCategories = OrganizeCategories::getShareinoids($categories);
+        $categories = ProductCore::getProductCategories($product->id);
 
         $tags = $product->getTags($this->context->language->id);
         $tags = explode(",", $tags);
@@ -325,7 +323,7 @@ class ProductUtiles
             "available_for_order" => $product->available_for_order,
             "original_url" => $link->getProductLink($product),
             "brand_id" => "",
-            "categories" => $productCategories,
+            "categories" => $categories,
             "short_content" => $product->description_short,
             "long_content" => $product->description,
             "meta_keywords" => $product->meta_keywords,
