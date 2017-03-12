@@ -22,8 +22,9 @@ if (!defined('_PS_VERSION_'))
     exit;
 function upgrade_module_1_2_9()
 {
+    $query = 'DROP TABLE IF NOT EXISTS  `' . _DB_PREFIX_ . 'shareino_organized`;';
     $tab = new TabCore(TabCore::getIdFromClassName("AdminManageCats"));
     if ($tab->name != null)
-        return $tab->delete();
+        return $tab->delete() && Db::getInstance()->execute($query);
     return true;
 }
