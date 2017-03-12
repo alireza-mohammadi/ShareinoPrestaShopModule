@@ -35,16 +35,6 @@ $sql[] = 'INSERT IGNORE INTO  `'._DB_PREFIX_.'shareino_sync` (`product_id`,`stat
             SELECT `id_product` AS `product_id`,0 AS `status`
             from  `'._DB_PREFIX_.'product`;';
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_organized` (
-  `id_shareino_organized` int(11) NOT NULL AUTO_INCREMENT,
-  `model` varchar(50) DEFAULT NULL,
-  `cat_id` int(10) unsigned NOT NULL,
-  `ids` varchar(200) NOT NULL,
-  `names` varchar(500) DEFAULT NULL,
-  PRIMARY KEY (`id_shareino_organized`),
-  UNIQUE KEY `cat_id_UNIQUE` (`cat_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;';
-
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
         return false;
