@@ -88,9 +88,9 @@
                     token: token,
                 },
             }).done(function (data) {
-                l(data);
                 if (data.status) {
                     $("#loadingBox").hide();
+                    messageBox.removeClass("alert-danger");
                     messageBox.addClass("alert-success");
                     messageText.html("تمامی دسته بندی ها با موفقیت ارسال شدند");
                     messageBox.show(500);
@@ -147,6 +147,7 @@
             if (productIDs.length <= 0) {
                 messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
                 messageBox.show(500);
+                messageBox.removeClass("alert-danger");
                 messageBox.addClass('alert-success');
                 submitBtn.html("همسان سازی همه");
                 return;
@@ -177,7 +178,10 @@
                         messageBox.show(500);
                         messageBox.addClass("alert-danger");
                         stop = false;
-                        stopSync();
+                        submitProgress.css("width", "0%")
+                        submitProgress.css("width", "0%")
+                            .attr("aria-valuemin", "0%");
+                        $("#progress").hide(500);
                     }
                 }).fail(function () {
 

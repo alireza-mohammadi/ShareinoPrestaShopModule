@@ -134,16 +134,21 @@ class AdminSynchronizeController extends ModuleAdminController
         }
     }
 
-    function ajaxProcessSendCats()
+    public function ajaxProcessSendCats()
     {
         $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
         $output = array();
         $this->treeCategories($categories, $output);
         $productUtiles = new ProductUtiles($this->context);
-        echo Tools::jsonEncode($productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output)));
+        $result = $productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output));
+        if ($result['status']) {
+            ConfigurationCore::set("SHAREINO_SENT_CATS", true);
+        }
+        ob_start();
+        echo Tools::jsonEncode($result);
     }
 
-    function treeCategories($pcategories, &$outPut)
+    public function treeCategories($pcategories, &$outPut)
     {
         foreach ($pcategories as $category) {
             $outPut[] = array("id" => $category["id_category"],

@@ -91,7 +91,7 @@ class ProductUtiles
      * @param null $body content of request like product
      * @return mixed | null
      */
-    public function  sendRequset($url, $method, $body = null)
+    public function sendRequset($url, $method, $body = null)
     {
 
 
@@ -144,7 +144,7 @@ class ProductUtiles
                     "code" => $httpcode,
                     "data" => "خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
             } else {
-                $json=Tools::jsonDecode($result,true);
+                $json = Tools::jsonDecode($result, true);
                 return array("status" => $json["status"],
                     "code" => $httpcode,
                     "data" => $json["message"]);

@@ -22,8 +22,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__) . '/classes/ShareinoSync.php');
-require_once(dirname(__FILE__) . '/classes/ProductUtiles.php');
+require_once (dirname(__FILE__) . '/classes/ShareinoSync.php');
+require_once (dirname(__FILE__) . '/classes/ProductUtiles.php');
+require_once (dirname(__FILE__) .'/controllers/admin/AdminSynchronizeController.php');
 
 class Shareino extends Module
 {
@@ -226,6 +227,24 @@ class Shareino extends Module
         if (!isset($params['product'])) {
             $this->hookActionProductDelete($params);
             return;
+        }
+
+        if (ConfigurationCore::get("SHAREINO_SENT_CATS") !== true) {
+
+            $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
+
+            $output = array();
+
+            $syncController = new AdminSynchronizeController();
+            $syncController->treeCategories($categories, $output);
+
+            $productUtiles = new ProductUtiles($this->context);
+            $result = Tools::jsonEncode($productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output)));
+            $result_array = Tools::jsonDecode($result, true);
+
+            if ($result_array['status']) {
+                ConfigurationCore::set("SHAREINO_SENT_CATS", true);
+            }
         }
 
         $productUtil = new ProductUtiles($this->context);
