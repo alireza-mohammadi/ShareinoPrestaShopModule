@@ -153,7 +153,7 @@ class ProductUtiles
         } else {
             return array("status" => false,
                 "code" => 404,
-                "data" => "توکن یافت نشد");
+                "data" => "لطفا توکن را در بخش تنظیمات ماژول شرینو وارد کنید");
         }
 
         return array("status" => false,

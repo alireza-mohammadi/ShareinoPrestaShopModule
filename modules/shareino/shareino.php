@@ -290,13 +290,5 @@ class Shareino extends Module
         $tab->module = $this->name;
         $tab->add();
 
-        $tab = new Tab();
-
-        // Need a foreach for the language
-        $tab->name[$this->context->language->id] = $this->l('معادل سازی دسته بندی ها');
-        $tab->class_name = 'AdminManageCats';
-        $tab->id_parent = $parent_tab->id;
-        $tab->module = $this->name;
-        $tab->add();
     }
 }

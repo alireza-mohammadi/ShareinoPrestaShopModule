@@ -76,7 +76,7 @@ class AdminSynchronizeController extends ModuleAdminController
     {
         if (file_exists($this->getTemplatePath() . $tpl_name) && $this->viewAccess()) {
 
-            return $this->context->smarty->createTemplate($this->getTemplatePath() . 'sync_content.tpl', $this->context->smarty);
+            return $this->context->smarty->createTemplate($this->getTemplatePath() . 'content.tpl', $this->context->smarty);
         }
         return parent::createTemplate($tpl_name);
     }

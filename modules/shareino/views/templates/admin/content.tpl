@@ -88,6 +88,7 @@
                     token: token,
                 },
             }).done(function (data) {
+                l(data);
                 if (data.status) {
                     $("#loadingBox").hide();
                     messageBox.addClass("alert-success");
@@ -95,7 +96,7 @@
                     messageBox.show(500);
                 }
                 else {
-                    $("#loadingBox").hidden();
+                    $("#loadingBox").hide();
                     messageText.html(data.data);
                     messageBox.show(500);
                     messageBox.addClass("alert-danger");
