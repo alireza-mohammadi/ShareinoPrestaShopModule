@@ -100,7 +100,7 @@
                     messageText.html(data.data);
                     messageBox.show(500);
                     messageBox.addClass("alert-danger");
-                    stop();
+                    stop = true;
                 }
             }).fail(function () {
 
@@ -142,7 +142,6 @@
 
 
         function SyncProducts() {
-
             console.log(productIDs.length);
 
             if (productIDs.length <= 0) {
@@ -166,7 +165,6 @@
                         controller: 'AdminSynchronize',
                         action: 'SyncProducts',
                         token: token,
-
                         ids: IDs
                     },
                 }).done(function (data) {
@@ -178,7 +176,8 @@
                         messageText.html(data.data);
                         messageBox.show(500);
                         messageBox.addClass("alert-danger");
-                        stop();
+                        stop = false;
+                        stopSync();
                     }
                 }).fail(function () {
 

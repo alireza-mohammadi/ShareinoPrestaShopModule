@@ -123,7 +123,15 @@ class AdminSynchronizeController extends ModuleAdminController
         $productUtiles = new ProductUtiles($this->context);
         $ids = Tools::getValue('ids');
         ob_start();
-        echo Tools::jsonEncode($productUtiles->syncProduct($ids));
+        $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
+
+        if (empty($SHAREINO_API_TOKEN)) {
+            echo Tools::jsonEncode(array("status" => false,
+                "code" => 401,
+                "data" => "لطفا توکن را در بخش تنظیمات ماژول شرینو وارد کنید"));
+        } else {
+            echo Tools::jsonEncode($productUtiles->syncProduct($ids));
+        }
     }
 
     function ajaxProcessSendCats()
