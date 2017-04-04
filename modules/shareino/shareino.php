@@ -33,7 +33,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.2.9';
+        $this->version = '1.2.10';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
