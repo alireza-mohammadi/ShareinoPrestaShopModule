@@ -15,15 +15,15 @@
  *
  * @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
  * @copyright 2015-2016 Shareino Co
- *  Tejarat Ejtemaie Eram
+ * Tejarat Ejtemaie Eram
  */
-
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-
-header('Location: ../');
-exit;
+if (!defined('_PS_VERSION_'))
+    exit;
+function upgrade_module_1_2_9()
+{
+    $query = 'DROP TABLE IF EXISTS  `' . _DB_PREFIX_ . 'shareino_organized`;';
+    $tab = new TabCore(TabCore::getIdFromClassName("AdminManageCats"));
+    if ($tab->name != null)
+        return $tab->delete() && Db::getInstance()->execute($query);
+    return true;
+}

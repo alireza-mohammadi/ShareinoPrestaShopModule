@@ -5,26 +5,26 @@
  * NOTICE OF LICENSE
  *
  * This source file is for module that make sync Product With shareino server
- * https://github.com/SaeedDarvish/PrestaShopShareinoModule
+ * https://github.com/SaeedDarvish/ShareinoPrestaShopModule
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Shareino to newer
  * versions in the future. If you wish to customize Shareino for your
- * needs please refer to https://github.com/SaeedDarvish/PrestaShopShareinoModule for more information.
+ * needs please refer to https://github.com/SaeedDarvish/ShareinoPrestaShopModule for more information.
  *
  * @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
  * @copyright 2015-2016 Shareino Co
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  Tejarat Ejtemaie Eram
+ * Tejarat Ejtemaie Eram
  */
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__) . '/classes/ShareinoSync.php');
-require_once(dirname(__FILE__) . '/classes/ProductUtiles.php');
+require_once (dirname(__FILE__) . '/classes/ShareinoSync.php');
+require_once (dirname(__FILE__) . '/classes/ProductUtiles.php');
+require_once (dirname(__FILE__) .'/controllers/admin/AdminSynchronizeController.php');
 
 class Shareino extends Module
 {
@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.2.5';
+        $this->version = '1.2.10';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -62,9 +62,12 @@ class Shareino extends Module
         $this->installTabs();
 
         return parent::install() &&
-        $this->registerHook('actionProductDelete') &&
-        $this->registerHook('actionProductSave') &&
-        $this->registerHook('actionUpdateQuantity');
+            $this->registerHook('actionProductDelete') &&
+            $this->registerHook('actionProductSave') &&
+            $this->registerHook('actionUpdateQuantity') &&
+            $this->registerHook('actionCategoryAdd') &&
+            $this->registerHook('actionObjectCategoryUpdateAfter') &&
+            $this->registerHook('actionCategoryDelete');
     }
 
     public function uninstall()
@@ -173,6 +176,37 @@ class Shareino extends Module
         }
     }
 
+    public function hookActionCategoryAdd($params)
+    {
+        if (isset($params['category']) && !empty($params['category'])) {
+
+            $category = array("id" => $params['category']->id,
+                "parent_id" => $params['category']->id_parent,
+                "name" => $params['category']->name[$this->context->language->id],
+            );
+
+            $productUtiles = new ProductUtiles($this->context);
+            $productUtiles->sendRequset("categories", "POST", Tools::jsonEncode($category));
+        }
+    }
+
+    public function hookActionObjectCategoryUpdateAfter($params)
+    {
+        if (isset($params['object']) && !empty($params['object'])) {
+            $category = array("id" => $params['object']->id_category,
+                "parent_id" => $params['object']->id_parent,
+                "name" => $params['object']->name[$this->context->language->id],
+            );
+            $productUtiles = new ProductUtiles($this->context);
+            $productUtiles->sendRequset("categories", "POST", Tools::jsonEncode($category));
+        }
+    }
+
+    public function hookActionObjectCategoryDeleteAfter($params)
+    {
+
+    }
+
     public function hookActionProductDelete($params)
     {
         $product_id = $params["id_product"];
@@ -187,10 +221,6 @@ class Shareino extends Module
 
     public function hookActionProductSave($params)
     {
-
-        if (!isset($params["product"]))
-            return true;
-
         $product_id = $params["id_product"];
 
         // When its delete action so call delete hook
@@ -199,15 +229,31 @@ class Shareino extends Module
             return;
         }
 
+        if (ConfigurationCore::get("SHAREINO_SENT_CATS") !== true) {
+
+            $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
+
+            $output = array();
+
+            $syncController = new AdminSynchronizeController();
+            $syncController->treeCategories($categories, $output);
+
+            $productUtiles = new ProductUtiles($this->context);
+            $result = Tools::jsonEncode($productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output)));
+            $result_array = Tools::jsonDecode($result, true);
+
+            if ($result_array['status']) {
+                ConfigurationCore::set("SHAREINO_SENT_CATS", true);
+            }
+        }
+
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($product_id);
 
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
-            if ($result !== null)
-                $productUtil->parsSyncResult($result, $product_id);
-        } else {
-            $productUtil->deleteProducts($product_id);
+            if ($result["status"])
+                $productUtil->parsSyncResult($result["data"], $product_id);
         }
 
         return $params;
@@ -215,7 +261,23 @@ class Shareino extends Module
 
     public function hookActionUpdateQuantity($params)
     {
-        $this->hookActionProductSave($params);
+        if (!isset($params['id_product']))
+            return true;
+
+        $productUtil = new ProductUtiles($this->context);
+        $product = $productUtil->getProductDetailById($params['id_product']);
+
+        if ($product) {
+            if (isset($product['variants'][$params['id_product_attribute']]))
+                $product['variants'][$params['id_product_attribute']] = $params['quantity'];
+        }
+
+        if ($product["active"]) {
+            $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
+            if ($result["status"])
+                $productUtil->parsSyncResult($result["data"], $params['id_product']);
+        }
+
     }
 
     public function hookActionProductUpdate($params)
@@ -247,13 +309,5 @@ class Shareino extends Module
         $tab->module = $this->name;
         $tab->add();
 
-        $tab = new Tab();
-
-        // Need a foreach for the language
-        $tab->name[$this->context->language->id] = $this->l('معادل سازی دسته بندی ها');
-        $tab->class_name = 'AdminManageCats';
-        $tab->id_parent = $parent_tab->id;
-        $tab->module = $this->name;
-        $tab->add();
     }
 }

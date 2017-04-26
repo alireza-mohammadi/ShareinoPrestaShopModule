@@ -5,17 +5,16 @@
  * NOTICE OF LICENSE
  *
  * This source file is for module that make sync Product With shareino server
- * https://github.com/SaeedDarvish/PrestaShopShareinoModule
+ * https://github.com/SaeedDarvish/ShareinoPrestaShopModule
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Shareino to newer
  * versions in the future. If you wish to customize Shareino for your
- * needs please refer to https://github.com/SaeedDarvish/PrestaShopShareinoModule for more information.
+ * needs please refer to https://github.com/SaeedDarvish/ShareinoPrestaShopModule for more information.
  *
  * @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
  * @copyright 2015-2016 Shareino Co
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
 
@@ -25,7 +24,7 @@ require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 class ProductUtiles
 {
     public $context;
-    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
+    const SHAREINO_API_URL = "http://shareino.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -57,10 +56,12 @@ class ProductUtiles
             }
             if (!empty($products)) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($products));
+                if ($result["status"])
+                    $this->parsSyncResult($result["status"], $productIds);
             }
         }
         if ($result !== null)
-            return $this->parsSyncResult($result, $productIds);
+            return $result;
         else
             return null;
 
@@ -92,16 +93,21 @@ class ProductUtiles
      */
     public function sendRequset($url, $method, $body = null)
     {
+
+
         // Init curl
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         // Generate url and set method in url
         $url = self::SHAREINO_API_URL . $url;
+
         curl_setopt($curl, CURLOPT_URL, $url);
 
         // Set method in curl
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 
         // Get token from site setting
         $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
@@ -109,11 +115,11 @@ class ProductUtiles
 
         // Check if token has been set then send request to {@link http://shareino.com}
         if (!empty($SHAREINO_API_TOKEN)) {
+
             // Set Body if its exist
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
-//            curl_setopt($curl, CURLOPT_HEADER, true);    // we want headers
 
             $shareinoModule = Module::getInstanceByName('shareino');
 
@@ -129,19 +135,30 @@ class ProductUtiles
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if ($httpcode === 401 || $httpcode === 403) {
-
-                Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
-                $this->context->smarty->assign('error', 'fuck!');
-                return null;
-
+            if ($httpcode === 200) {
+                return array("status" => true,
+                    "code" => $httpcode,
+                    "data" => Tools::jsonDecode($result, true));
+            } else if ($httpcode === 401 || $httpcode === 403) {
+                return array("status" => false,
+                    "code" => $httpcode,
+                    "data" => "خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
+            } else {
+                $json = Tools::jsonDecode($result, true);
+                return array("status" => $json["status"],
+                    "code" => $httpcode,
+                    "data" => $json["message"]);
             }
-            return $result;
+
         } else {
-            Tools::displayError("توکن وارد نشده است");
-            return null;
+            return array("status" => false,
+                "code" => 404,
+                "data" => "لطفا توکن را در بخش تنظیمات ماژول شرینو وارد کنید");
         }
-        return null;
+
+        return array("status" => false,
+            "code" => 500,
+            "data" => "عملیات با خطا مواجه شد لطفا مجدد تلاش فرمایید");
     }
 
 
@@ -228,8 +245,6 @@ class ProductUtiles
 
     public function getProductDetail($product)
     {
-
-        return;
         // Check Availability of sell out of stock products
         $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
         $out_of_stock = $stockAvalible->out_of_stock;
@@ -254,37 +269,10 @@ class ProductUtiles
 
 
         $variations = array();
+        $priceWithoutReduct = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
 
-        $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
-
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0);
-
-
-        $discount = array();
-
-
-        if ($specificPrice) {
-
-            $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
-
-            if ($specificPrice['price'] < 0) {
-                $discount = array(
-                    'amount' => $specificPrice['reduction'] * 100,
-                    'start_date' => $specificPrice['from'],
-                    'end_date' => $specificPrice['to'],
-                    'quantity' => $specificPrice['from_quantity'],
-                    'tax' => $specificPrice['reduction_tax']
-                );
-                if ('amount' == $specificPrice['reduction_type'])
-                    $discount["type"] = 0;
-
-                if ('percentage' == $specificPrice['reduction_type'])
-                    $discount["type"] = 1;
-            }
-        }
 
         foreach ($vars as $var) {
-            $vdiscount = array();
             $groupName = Tools::strtolower($var["group_name"]);
             $groupName = str_replace(" ", "_", $groupName);
 
@@ -296,31 +284,7 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
-
-
-            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
-
-            if ($vSpecificPrice) {
-
-                $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
-                    , $var["id_product_attribute"]);
-                if ($vSpecificPrice['price'] < 0) {
-                    $vdiscount = array(
-                        'amount' => $vSpecificPrice['reduction'] * 100,
-                        'start_date' => $vSpecificPrice['from'],
-                        'end_date' => $vSpecificPrice['to'],
-                        'quantity' => $vSpecificPrice['from_quantity'],
-                        'tax' => $vSpecificPrice['reduction_tax']
-                    );
-                    if ('amount' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 0;
-
-                    if ('percentage' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 1;
-                }
-            }
-            $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
-
+            $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC, $var["id_product_attribute"]);
 
 
         }
@@ -340,9 +304,7 @@ class ProductUtiles
         }
 
         // Get All Categories
-        $categories = Product::getProductCategoriesFull($product->id, $this->context->language->id);
-
-        $productCategories = OrganizeCategories::getShareinoids($categories);
+        $categories = ProductCore::getProductCategories($product->id);
 
         $tags = $product->getTags($this->context->language->id);
         $tags = explode(",", $tags);
@@ -351,16 +313,16 @@ class ProductUtiles
             "name" => $product->name,
             "code" => $product->id,
             "sku" => $product->reference,
-            "price" => $price,
+            "price" => $priceWithoutReduct,
             "active" => $product->active,
             "sale_price" => "",
-            "discount" => $discount,
+            "discount" => "",
             "quantity" => Product::getQuantity($product->id),
             "weight" => $product->weight,
             "available_for_order" => $product->available_for_order,
             "original_url" => $link->getProductLink($product),
             "brand_id" => "",
-            "categories" => $productCategories,
+            "categories" => $categories,
             "short_content" => $product->description_short,
             "long_content" => $product->description,
             "meta_keywords" => $product->meta_keywords,
@@ -373,8 +335,6 @@ class ProductUtiles
             "tags" => $tags
         );
 
-        echo json_encode($product_detail);
-        die;
         return $product_detail;
     }
 
