@@ -5,16 +5,17 @@
  * NOTICE OF LICENSE
  *
  * This source file is for module that make sync Product With shareino server
- * https://github.com/SaeedDarvish/ShareinoPrestaShopModule
+ * https://github.com/SaeedDarvish/PrestaShopShareinoModule
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Shareino to newer
  * versions in the future. If you wish to customize Shareino for your
- * needs please refer to https://github.com/SaeedDarvish/ShareinoPrestaShopModule for more information.
+ * needs please refer to https://github.com/SaeedDarvish/PrestaShopShareinoModule for more information.
  *
  * @author    Saeed Darvish <sd.saeed.darvish@gmail.com>
  * @copyright 2015-2016 Shareino Co
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
 
@@ -58,7 +59,10 @@ class AdminSynchronizeController extends ModuleAdminController
 // Add bulk actions
         $this->bulk_actions = array(
             'synchronizeAction' => array(
-                'text' => $this->l('همسان سازی'), 'confirm' => $this->l('Are you sure?'),
+                'text' => $this->l('Synchronize'), 'confirm' => $this->l('Are you sure?'),
+            ),
+            'deleteAction' => array(
+                'text' => $this->l('Delete From Shareino'), 'confirm' => $this->l('Are you sure?'),
             )
         );
 
@@ -72,17 +76,44 @@ class AdminSynchronizeController extends ModuleAdminController
         $productUtiles->bulkSync($this->boxes);
     }
 
+    protected function processBulkDeleteAction()
+    {
+        $productUtiles = new ProductUtiles($this->context);
+        $sync = new ShareinoSync();
+        $productIds = $sync->getProductsIds($this->boxes);
+
+        $productUtiles->deleteProducts($productIds);
+        if ($productIds) {
+            $sync->changeProductsStatus($this->boxes, 0);
+        }
+    }
+
+
     public function createTemplate($tpl_name)
     {
         if (file_exists($this->getTemplatePath() . $tpl_name) && $this->viewAccess()) {
 
-            return $this->context->smarty->createTemplate($this->getTemplatePath() . 'content.tpl', $this->context->smarty);
+            return $this->context->smarty->createTemplate($this->getTemplatePath() . 'sync_content.tpl', $this->context->smarty);
         }
         return parent::createTemplate($tpl_name);
     }
 
     public function processConfiguration()
     {
+
+        if (Tools::isSubmit('shareino_synchronize_all')) {
+            $productUtiles = new ProductUtiles($this->context);
+            $sync = new ShareinoSync();
+            $productIds = $sync->getProductsIds(null, true);
+
+            if ($productIds) {
+                $split_ids = array_chunk($productIds, 75);
+                foreach ($split_ids as $pIds) {
+                    $productUtiles->syncProduct($pIds);
+                }
+            }
+
+        }
         $this->context->smarty->assign('module_dir', __PS_BASE_URI__ . 'modules/');
 
 
@@ -92,18 +123,9 @@ class AdminSynchronizeController extends ModuleAdminController
         $this->context->smarty->assign('list', $this->renderList());
         $this->context->smarty->assign('url', $url);
 
-        $this->context->smarty->assign(array(
-            'token' => Tools::getAdminTokenLite('AdminSynchronize')
-        ));
-
         $link = new LinkCore();
         $action = $link->getAdminLink("AdminSynchronize");
         $this->context->smarty->assign('actionUrl', $action);
-
-
-        $sync = new ShareinoSync();
-        $productIds = $sync->getProductsIds(null, true);
-        $this->context->smarty->assign('productIDs', $productIds);
     }
 
     public function renderForm()
@@ -116,49 +138,6 @@ class AdminSynchronizeController extends ModuleAdminController
         parent::initContent();
         $this->processConfiguration();
         $this->context->smarty;
-    }
-
-    function ajaxProcessSyncProducts()
-    {
-        $productUtiles = new ProductUtiles($this->context);
-        $ids = Tools::getValue('ids');
-        ob_start();
-        $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
-
-        if (empty($SHAREINO_API_TOKEN)) {
-            echo Tools::jsonEncode(array("status" => false,
-                "code" => 401,
-                "data" => "لطفا توکن را در بخش تنظیمات ماژول شرینو وارد کنید"));
-        } else {
-            echo Tools::jsonEncode($productUtiles->syncProduct($ids));
-        }
-    }
-
-    public function ajaxProcessSendCats()
-    {
-        $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
-        $output = array();
-        $this->treeCategories($categories, $output);
-        $productUtiles = new ProductUtiles($this->context);
-        $result = $productUtiles->sendRequset("categories/sync", "POST", Tools::jsonEncode($output));
-        if ($result['status']) {
-            ConfigurationCore::set("SHAREINO_SENT_CATS", true);
-        }
-        ob_start();
-        echo Tools::jsonEncode($result);
-    }
-
-    public function treeCategories($pcategories, &$outPut)
-    {
-        foreach ($pcategories as $category) {
-            $outPut[] = array("id" => $category["id_category"],
-                "parent_id" => $category["id_parent"],
-                "name" => $category["name"],
-                "link_rewrite" => $category["link_rewrite"],
-            );
-            if (isset($category) & !empty($category['children']))
-                $this->treeCategories($category['children'], $outPut);
-        }
     }
 
 }
