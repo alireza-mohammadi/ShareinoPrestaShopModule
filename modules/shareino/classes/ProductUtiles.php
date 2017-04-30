@@ -283,7 +283,7 @@ class ProductUtiles
  $discount = array();
         $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
 
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0);
+        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0,0, 0, 0, 0,0,0);
 
 		 if ($specificPrice) {
             $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
