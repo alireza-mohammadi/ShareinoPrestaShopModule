@@ -39,7 +39,7 @@ class ProductUtiles
      * @param $productIds
      * @internal param $productId
      */
-	 
+
 	  public function syncProductDiscount($productIds)
     {
         $products = array();
@@ -62,7 +62,7 @@ class ProductUtiles
             if (!empty($products)) {
                 $result = $this->sendRequset("discounts", "POST", Tools::jsonEncode($products));
             }
-			
+
 
         }
 
@@ -76,7 +76,7 @@ class ProductUtiles
 
 
     }
-	
+
     public function syncProduct($productIds)
     {
         $products = array();
@@ -269,9 +269,9 @@ class ProductUtiles
         $link = new Link;//because getImageLInk is not static function
         foreach ($images as $image) {
             if ($image["cover"]) {
-                $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
+                $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
             } else {
-                $imagesPath[] = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
+                $imagesPath[] = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
             }
         }
 
@@ -301,9 +301,9 @@ class ProductUtiles
                     $discount["type"] = 1;
             }
         }
-		
 
-       
+
+
 
 
         foreach ($vars as $var) {
@@ -348,8 +348,8 @@ class ProductUtiles
 
         }
 
-       
-       
+
+
 
         $product_detail = array(
             "name" => $product->name,
@@ -357,15 +357,15 @@ class ProductUtiles
             "sku" => $product->reference,
             "price" => $price,
             "active" => $product->active,
-           
+
             "discount" => $discount,
-            
+
             "variants" => $variations,
-           
+
         );
- 
+
         return $product_detail;
-		
+
     }
     public function getProductDetailById($productId = null)
     {
@@ -395,9 +395,9 @@ class ProductUtiles
         $link = new Link;//because getImageLInk is not static function
         foreach ($images as $image) {
             if ($image["cover"]) {
-                $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
+                $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
             } else {
-                $imagesPath[] = $link->getImageLink($product->link_rewrite, $image['id_image'], 'large_default');
+                $imagesPath[] = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
             }
         }
 
@@ -419,10 +419,10 @@ class ProductUtiles
         //        WHERE id_product = ' . (int)$product->id . '
          //       ORDER BY id_specific_price';
          //   $discount = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
-			
+
 			//return $query;
-			
-			
+
+
 
        // if ($specificPrice) {
 
