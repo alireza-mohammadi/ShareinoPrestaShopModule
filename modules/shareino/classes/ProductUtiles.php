@@ -18,13 +18,14 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  Tejarat Ejtemaie Eram
  */
-
 require_once(dirname(__FILE__) . '/ShareinoSync.php');
 require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 
 class ProductUtiles
 {
+
     public $context;
+
     const SHAREINO_API_URL = "http://localhost:8000/api/v1/public/";
 
     public function __construct($context)
@@ -39,8 +40,7 @@ class ProductUtiles
      * @param $productIds
      * @internal param $productId
      */
-
-	  public function syncProductDiscount($productIds)
+    public function syncProductDiscount($productIds)
     {
         $products = array();
         $result = null;
@@ -55,26 +55,19 @@ class ProductUtiles
                 if ($product && $product != null && $product["active"]) {
                     $products[] = $product;
                 }
-
             }
-            echo json_encode($products);
-           die;
+//            echo json_encode($products);
+//            die;
             if (!empty($products)) {
                 $result = $this->sendRequset("discounts", "POST", Tools::jsonEncode($products));
             }
-
-
         }
 
-       //
-        d($result) ;
-
+        //
         if ($result !== null)
             return $this->parsSyncResult($result, $productIds);
         else
-           return null;
-
-
+            return null;
     }
 
     public function syncProduct($productIds)
@@ -102,8 +95,6 @@ class ProductUtiles
             return $this->parsSyncResult($result, $productIds);
         else
             return null;
-
-
     }
 
     public function bulkSync($ids, $product_ids = null)
@@ -158,8 +149,8 @@ class ProductUtiles
             $shareinoModule = Module::getInstanceByName('shareino');
 
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    "Authorization:Bearer $SHAREINO_API_TOKEN",
-                    "User-Agent:PrestaShop_Module_$shareinoModule->version"
+                "Authorization:Bearer $SHAREINO_API_TOKEN",
+                "User-Agent:PrestaShop_Module_$shareinoModule->version"
                 )
             );
 
@@ -174,7 +165,6 @@ class ProductUtiles
                 Tools::displayError("خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
                 $this->context->smarty->assign('error', 'fuck!');
                 return null;
-
             }
             return $result;
         } else {
@@ -183,7 +173,6 @@ class ProductUtiles
         }
         return null;
     }
-
 
     public function parsSyncResult($results, $productIds = null)
     {
@@ -253,11 +242,12 @@ class ProductUtiles
         }
         return array();
     }
- public function getProductDiscountDetailById($productId = null)
+
+    public function getProductDiscountDetailById($productId = null)
     {
 
         $product = new Product($productId, false, $this->context->language->id);
-		   $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
+        $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
         $out_of_stock = $stockAvalible->out_of_stock;
         if ($out_of_stock == 2)
             $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
@@ -266,7 +256,7 @@ class ProductUtiles
 
         $coverPath = "";
         $imagesPath = array();
-        $link = new Link;//because getImageLInk is not static function
+        $link = new Link; //because getImageLInk is not static function
         foreach ($images as $image) {
             if ($image["cover"]) {
                 $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
@@ -280,12 +270,12 @@ class ProductUtiles
 
 
         $variations = array();
- $discount = array();
+        $discount = array();
         $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
 
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0,0, 0, 0, 0,0,0);
+        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-		 if ($specificPrice) {
+        if ($specificPrice) {
             $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
             if ($specificPrice['price'] < 0) {
                 $discount = array(
@@ -343,9 +333,6 @@ class ProductUtiles
                 }
             }
             $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
-
-
-
         }
 
 
@@ -357,16 +344,13 @@ class ProductUtiles
             "sku" => $product->reference,
             "price" => $price,
             "active" => $product->active,
-
             "discount" => $discount,
-
             "variants" => $variations,
-
         );
 
         return $product_detail;
-
     }
+
     public function getProductDetailById($productId = null)
     {
 
@@ -392,7 +376,7 @@ class ProductUtiles
 
         $coverPath = "";
         $imagesPath = array();
-        $link = new Link;//because getImageLInk is not static function
+        $link = new Link; //because getImageLInk is not static function
         foreach ($images as $image) {
             if ($image["cover"]) {
                 $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
@@ -409,40 +393,39 @@ class ProductUtiles
 
         $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
 
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0);
+        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0);
 
 
         $discount = array();
 
-		// $query = 'SELECT `from` as start_date, `to` as end_date,from_quantity as quantity, reduction as amount ,reduction_type
-         //       FROM ' . _DB_PREFIX_ . 'specific_price
+        // $query = 'SELECT `from` as start_date, `to` as end_date,from_quantity as quantity, reduction as amount ,reduction_type
+        //       FROM ' . _DB_PREFIX_ . 'specific_price
         //        WHERE id_product = ' . (int)$product->id . '
-         //       ORDER BY id_specific_price';
-         //   $discount = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
-
-			//return $query;
-
+        //       ORDER BY id_specific_price';
+        //   $discount = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+        //return $query;
 
 
-       // if ($specificPrice) {
 
-       //     $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
+        if ($specificPrice) {
 
-       //     if ($specificPrice['price'] < 0) {
-       //         $discount = array(
-       //             'amount' => $specificPrice['reduction'] * 100,
-       //             'start_date' => $specificPrice['from'],
-       //             'end_date' => $specificPrice['to'],
-        //            'quantity' => $specificPrice['from_quantity'],
-        //            'tax' => $specificPrice['reduction_tax']
-        //        );
-         //       if ('amount' == $specificPrice['reduction_type'])
-         //           $discount["type"] = 0;
+            $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
 
-        //        if ('percentage' == $specificPrice['reduction_type'])
+            if ($specificPrice['price'] < 0) {
+                $discount = array(
+                    'amount' => $specificPrice['reduction'] * 100,
+                    'start_date' => $specificPrice['from'],
+                    'end_date' => $specificPrice['to'],
+                    'quantity' => $specificPrice['from_quantity'],
+                    'tax' => $specificPrice['reduction_tax']
+                );
+                if ('amount' == $specificPrice['reduction_type'])
+                    $discount["type"] = 0;
+
+                if ('percentage' == $specificPrice['reduction_type'])
                     $discount["type"] = 1;
-         //   }
-      //  }
+            }
+        }
 
         foreach ($vars as $var) {
             $vdiscount = array();
@@ -481,9 +464,6 @@ class ProductUtiles
                 }
             }
             $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
-
-
-
         }
 
         // Get All Product Attributes
@@ -534,8 +514,8 @@ class ProductUtiles
             "tags" => $tags
         );
 
-      //  echo json_encode($product_detail);
-      //  die;
+//          echo json_encode($product_detail);
+//          die;
         return $product_detail;
     }
 
@@ -558,7 +538,6 @@ class ProductUtiles
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
 
         return Tools::jsonDecode($result, true);
-
     }
 
 }
