@@ -440,14 +440,12 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
+                $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC, $var["id_product_attribute"]);
 
 
             $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
 
             if ($vSpecificPrice) {
-
-                $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
-                    , $var["id_product_attribute"]);
                 if ($vSpecificPrice['price'] < 0) {
                     $vdiscount = array(
                         'amount' => $vSpecificPrice['reduction'] * 100,
