@@ -26,7 +26,7 @@ class ProductUtiles
 
     public $context;
 
-    const SHAREINO_API_URL = "http://localhost:8000/api/v1/public/";
+    const SHAREINO_API_URL = "http://dev.scommerce.ir/api/v1/public/";
 
     public function __construct($context)
     {
@@ -45,9 +45,9 @@ class ProductUtiles
         $products = array();
         $result = null;
         if (!is_array($productIds)) {
-            $product = $this->getProductDetailById($productIds);
+            $product = $this->getProductDiscountDetailById($productIds);
             if ($product && $product != null) {
-                //$result = $this->sendRequset("products", "POST", Tools::jsonEncode($product));
+                $result = $this->sendRequset("products", "POST", Tools::jsonEncode($product));
             }
         } else {
             foreach ($productIds as $id) {
@@ -56,8 +56,7 @@ class ProductUtiles
                     $products[] = $product;
                 }
             }
-//            echo json_encode($products);
-//            die;
+           
             if (!empty($products)) {
                 $result = $this->sendRequset("discounts", "POST", Tools::jsonEncode($products));
             }
@@ -245,7 +244,6 @@ class ProductUtiles
 
     public function getProductDiscountDetailById($productId = null)
     {
-
         $product = new Product($productId, false, $this->context->language->id);
         $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
         $out_of_stock = $stockAvalible->out_of_stock;
@@ -273,9 +271,13 @@ class ProductUtiles
         $discount = array();
         $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
 
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-        if ($specificPrice) {
+       // $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
+                WHERE pf.id_product = ' . (int)$product->id .' and id_product_attribute=0';
+        $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+        $discounts=array();
+        foreach ($specificPrices as $specificPrice) {
+//        if ($specificPrice) {
             $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
             if ($specificPrice['price'] < 0) {
                 $discount = array(
@@ -289,12 +291,10 @@ class ProductUtiles
                     $discount["type"] = 0;
                 if ('percentage' == $specificPrice['reduction_type'])
                     $discount["type"] = 1;
+
+                array_push($discounts, $discount);
             }
         }
-
-
-
-
 
         foreach ($vars as $var) {
             $vdiscount = array();
@@ -309,14 +309,15 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
+            $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
+                , $var["id_product_attribute"]);
 
-
-            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
-
-            if ($vSpecificPrice) {
-
-                $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
-                    , $var["id_product_attribute"]);
+            $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"];
+            $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+////            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
+            foreach ($specificPricess as $vSpecificPrice) {
+                // if ($vSpecificPrice) {
                 if ($vSpecificPrice['price'] < 0) {
                     $vdiscount = array(
                         'amount' => $vSpecificPrice['reduction'] * 100,
@@ -344,9 +345,10 @@ class ProductUtiles
             "sku" => $product->reference,
             "price" => $price,
             "active" => $product->active,
-            "discount" => $discount,
+            "discount" => $discounts,
             "variants" => $variations,
         );
+
 
         return $product_detail;
     }
@@ -440,8 +442,8 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
-                $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC, $var["id_product_attribute"]);
-
+            $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
+                , $var["id_product_attribute"]);
 
             $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
 
