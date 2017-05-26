@@ -148,6 +148,16 @@ class AdminSynchronizeController extends ModuleAdminController
         echo Tools::jsonEncode($result);
     }
 
+    public function ajaxProcessSyncDiscounts()
+    {
+        $productUtil=new ProductUtiles($this->context);
+
+        $ids = Tools::getValue('ids');
+        ob_start();
+
+        echo Tools::jsonEncode($productUtil->syncProductDiscount($ids));
+    }
+
     public function treeCategories($pcategories, &$outPut)
     {
         foreach ($pcategories as $category) {

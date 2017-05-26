@@ -12,20 +12,62 @@
             <div class="row">
                 <div class="col-xs-12">
 
+
                     <form class="" action="{$actionUrl}" method="post" id="syncAllProductsForm" data-token='{$token}'
                           data-operation="start">
+
+                        <h2 class="text-right" style="font-weight: bold">
+                            مرحله اول
+                        </h2>
+
+                        <p class="text-right" style="font-size: 16px; margin-top: 10px">
+                            برای همگام سازی دسته بندی ها دکمه زیر را کلیک کنید
+                            <br/>
+                            <button type="button" class="btn btn-default" name="shareino_send_categories"
+                                    id="sendCatsBtn">
+                                <span class="glyphicon glyphicon-send" aria-hidden="true"
+                                      style="display: inline;"></span>
+                                ارسال تمامی دسته بندی ها
+                            </button>
+                        </p>
+
+
+                        <h2 class="text-right" style="font-weight: bold">
+                            مرحله دوم
+                        </h2>
+
+                        <p class="text-right" style="font-size: 16px; margin-top: 10px">
+                            برای همگام سازی کالاها بر روی دکمه زیر کلیک کنید
+                            <br/>
+                            <button type="submit" class="btn btn-default" name="shareino_synchronize_all"
+                                    id="syncSumblit">
+                                <span class="glyphicon glyphicon-send" aria-hidden="true"
+                                      style="display: inline;"></span>
+                                همسان سازی همه محصولات
+                            </button>
+                        </p>
+
+
+                        <h2 class="text-right" style="font-weight: bold">
+                            مرحله سوم
+                        </h2>
+
+                        <p class="text-right" style="font-size: 16px; margin-top: 10px">
+                            اگر در سایت خود تخفیف فعال دارید برای همگام سازی تخفیف ها بر روی دکمه زیر کلیک کنید
+                            <br/>
+                            <button type="button" class="btn btn-default" name="shareino_synchronize_all"
+                                    id="syncDiscount">
+                                <span class="glyphicon glyphicon-send" aria-hidden="true"
+                                      style="display: inline;"></span>
+                                همسان سازی تخفیف های محصولات
+                            </button>
+                        </p>
 
                         <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
                                     class="glyphicon glyphicon-cog"></span>
                             تنظیمات ماژول</a>
-                        <button type="button" class="btn btn-default" name="shareino_send_categories" id="sendCatsBtn">
-                            <span class="glyphicon glyphicon-send" aria-hidden="true" style="display: inline;"></span>
-                            ارسال تمامی دسته بندی ها
-                        </button>
-                        <button type="submit" class="btn btn-default" name="shareino_synchronize_all" id="syncSumblit">
-                            <span class="glyphicon glyphicon-send" aria-hidden="true" style="display: inline;"></span>
-                            همسان سازی همه
-                        </button>
+
+
                     </form>
 
 
@@ -72,6 +114,7 @@
         var syncFrom = $("#syncAllProductsForm");
         var submitBtn = $("#syncSumblit");
 
+
         $("#sendCatsBtn").on('click', function () {
 
             $("#loadingBox").show();
@@ -108,6 +151,19 @@
 
         });
 
+
+        $("#syncDiscount").on("click", function () {
+
+            productIDs = {$productIDs|json_encode};
+            lenght = productIDs.length;
+            submitProgress.show();
+
+            $("#progress").show(500)
+            setPercentage();
+
+            SyncDiscount();
+
+        });
         syncFrom.on("submit", function (event) {
 
             // Cancel Submit
@@ -188,6 +244,53 @@
                 });
 
             }
+        }
+
+        function SyncDiscount() {
+
+
+            if (productIDs.length <= 0) {
+                messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
+                messageBox.show(500);
+                messageBox.removeClass("alert-danger");
+                messageBox.addClass('alert-success');
+                submitBtn.html("همسان سازی همه");
+                return;
+            }
+
+            var IDs = productIDs.splice(0, chunk);
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: 'ajax-tab.php',
+                data: {
+                    //required parameters
+                    ajax: true,
+                    controller: 'AdminSynchronize',
+                    action: 'SyncDiscounts',
+                    token: token,
+                    ids: IDs
+                },
+            }).done(function (data) {
+                if (data.status) {
+                    setPercentage();
+                    SyncDiscount();
+                }
+                else {
+                    messageText.html(data.data);
+                    messageBox.show(500);
+                    messageBox.addClass("alert-danger");
+                    submitProgress.css("width", "0%")
+                    submitProgress.css("width", "0%")
+                        .attr("aria-valuemin", "0%");
+                    $("#progress").hide(500);
+                }
+            }).fail(function () {
+
+            });
+
+
         }
 
         function setPercentage() {
