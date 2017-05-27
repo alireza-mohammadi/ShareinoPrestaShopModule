@@ -410,43 +410,8 @@ class ProductUtiles
         $variations = array();
         $priceWithoutReduct = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
 
-        $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
-
-        $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0);
-
-
-        $discount = array();
-
-        // $query = 'SELECT `from` as start_date, `to` as end_date,from_quantity as quantity, reduction as amount ,reduction_type
-        //       FROM ' . _DB_PREFIX_ . 'specific_price
-        //        WHERE id_product = ' . (int)$product->id . '
-        //       ORDER BY id_specific_price';
-        //   $discount = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
-        //return $query;
-
-
-        if ($specificPrice) {
-
-            $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
-
-            if ($specificPrice['price'] < 0) {
-                $discount = array(
-                    'amount' => $specificPrice['reduction'] * 100,
-                    'start_date' => $specificPrice['from'],
-                    'end_date' => $specificPrice['to'],
-                    'quantity' => $specificPrice['from_quantity'],
-                    'tax' => $specificPrice['reduction_tax']
-                );
-                if ('amount' == $specificPrice['reduction_type'])
-                    $discount["type"] = 0;
-
-                if ('percentage' == $specificPrice['reduction_type'])
-                    $discount["type"] = 1;
-            }
-        }
 
         foreach ($vars as $var) {
-            $vdiscount = array();
             $groupName = Tools::strtolower($var["group_name"]);
             $groupName = str_replace(" ", "_", $groupName);
 
@@ -458,28 +423,9 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
-            $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC
-                , $var["id_product_attribute"]);
+            $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC, $var["id_product_attribute"]);
 
-            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
 
-            if ($vSpecificPrice) {
-                if ($vSpecificPrice['price'] < 0) {
-                    $vdiscount = array(
-                        'amount' => $vSpecificPrice['reduction'] * 100,
-                        'start_date' => $vSpecificPrice['from'],
-                        'end_date' => $vSpecificPrice['to'],
-                        'quantity' => $vSpecificPrice['from_quantity'],
-                        'tax' => $vSpecificPrice['reduction_tax']
-                    );
-                    if ('amount' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 0;
-
-                    if ('percentage' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 1;
-                }
-            }
-            $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
         }
 
         // Get All Product Attributes
@@ -506,10 +452,9 @@ class ProductUtiles
             "name" => $product->name,
             "code" => $product->id,
             "sku" => $product->reference,
-            "price" => $price,
+            "price" => $priceWithoutReduct,
             "active" => $product->active,
             "sale_price" => "",
-            "discount" => 0,
             "quantity" => Product::getQuantity($product->id),
             "weight" => $product->weight,
             "available_for_order" => $product->available_for_order,
