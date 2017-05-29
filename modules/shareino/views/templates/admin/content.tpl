@@ -11,17 +11,34 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12">
-
+                    <p style="font-size: 19px; font-weight: bolder" class="text-center">
+                        برای اتصال صحیح و ارسال خودکار محصولات خود به شرینو مراحل زیر را به ترتیب دنبال کنید
+                    </p>
 
                     <form class="" action="{$actionUrl}" method="post" id="syncAllProductsForm" data-token='{$token}'
                           data-operation="start">
 
-                        <h2 class="text-right" style="font-weight: bold">
-                            مرحله اول
+                        <h2 class="text-right" style="direction: rtl;font-weight: bold">
+                            1. تنظیمات ماژول :
                         </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            برای همگام سازی دسته بندی ها دکمه زیر را کلیک کنید
+                            قبل از ارسال کالا های فروشگاه برای شرینو لازم است طبق راهنمای شرینو ، توکن دریافتی را در بخش
+                            تنظیمات ماژول درج کنید .
+
+                            <br/>
+
+                            <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
+                                        class="glyphicon glyphicon-cog"></span>
+                                تنظیمات ماژول</a>
+                        </p>
+                        <h2 class="text-right" style="direction: rtl;font-weight: bold">
+
+
+                            2. سینک دسته بندی ها                        </h2>
+
+                        <p class="text-right" style="font-size: 16px; margin-top: 10px">
+                            قبل از ارسال محصولات به شرینو ، لازم است در ابتدا دسته بندی های خود رو جهت همسان سازی با شرینو ، ارسال کنید .
                             <br/>
                             <button type="button" class="btn btn-default" name="shareino_send_categories"
                                     id="sendCatsBtn">
@@ -32,12 +49,12 @@
                         </p>
 
 
-                        <h2 class="text-right" style="font-weight: bold">
-                            مرحله دوم
-                        </h2>
+                        <h2 class="text-right" style="direction: rtl;font-weight: bold">
+
+                            3. سینک محصولات                        </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            برای همگام سازی کالاها بر روی دکمه زیر کلیک کنید
+                            برای همسان سازی کالاها بر روی دکمه زیر کلیک کنید
                             <br/>
                             <button type="submit" class="btn btn-default" name="shareino_synchronize_all"
                                     id="syncSumblit">
@@ -47,13 +64,18 @@
                             </button>
                         </p>
 
-
-                        <h2 class="text-right" style="font-weight: bold">
-                            مرحله سوم
+                        <p style="font-size: 15px; font-weight: bolder;color: orangered" class="text-center">
+    نکته : مراحل فوق را فقط در ابتدای نصب ماژول و فقط یک بار لازم است انجام دهید
+</p>
+                        <h2 class="text-right" style="direction: rtl;font-weight: bold">
+                            4. سینک تخفیف ها
                         </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            اگر در سایت خود تخفیف فعال دارید برای همگام سازی تخفیف ها بر روی دکمه زیر کلیک کنید
+
+                            اگر تخفیف فعالی در فروشگاه خود دارید برای همسان سازی و ارسال تخفیف ها به شرینو از این گزینه استفاده کنید .
+                            بعد از هر بار تغییر در تخفیف ها لازم است ، همسان سازی تخفیف ها را مجددا انجام دهید .
+
                             <br/>
                             <button type="button" class="btn btn-default" name="shareino_synchronize_all"
                                     id="syncDiscount">
@@ -62,10 +84,6 @@
                                 همسان سازی تخفیف های محصولات
                             </button>
                         </p>
-
-                        <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
-                                    class="glyphicon glyphicon-cog"></span>
-                            تنظیمات ماژول</a>
 
 
                     </form>

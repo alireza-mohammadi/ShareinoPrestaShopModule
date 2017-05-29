@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.2.10';
+        $this->version = '1.3.0';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -303,7 +303,7 @@ class Shareino extends Module
 
         $tab = new Tab();
         // Need a foreach for the language
-        $tab->name[$this->context->language->id] = $this->l('همسان سازی محصولات');
+        $tab->name[$this->context->language->id] = $this->l('همسان سازی');
         $tab->class_name = 'AdminSynchronize';
         $tab->id_parent = $parent_tab->id;
         $tab->module = $this->name;

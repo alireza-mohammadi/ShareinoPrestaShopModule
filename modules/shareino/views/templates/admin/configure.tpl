@@ -26,9 +26,9 @@
 <div class="panel">
     <h3><i class="icon icon-tags"></i> {l s='Documentation' mod='shareino'}</h3>
     <p>
-        &raquo; {l s='You can get a PDF documentation to configure this module' mod='shareino'} :
+         {l s='شما میتوانید راهنمای نصب ماژول را دانلود کنید' mod='shareino'}
     <ul>
-        <li><a href="#" target="_blank">{l s='English' mod='shareino'}</a></li>
+        <li><a href="http://shareino.ir/files/lab/prestashop/shareino-prestashop-doc.pdf" target="_blank">{l s='دانلود' mod='shareino'}</a></li>
     </ul>
     </p>
 </div>
