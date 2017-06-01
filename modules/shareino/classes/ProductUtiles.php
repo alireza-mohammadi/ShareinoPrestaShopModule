@@ -124,7 +124,6 @@ class ProductUtiles
     public function sendRequset($url, $method, $body = null)
     {
 
-
         // Init curl
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -300,16 +299,20 @@ class ProductUtiles
             $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
             if ($specificPrice['price'] < 0) {
                 $discount = array(
-                    'amount' => $specificPrice['reduction'] * 100,
                     'start_date' => $specificPrice['from'],
                     'end_date' => $specificPrice['to'],
                     'quantity' => $specificPrice['from_quantity'],
                     'tax' => $specificPrice['reduction_tax']
                 );
-                if ('amount' == $specificPrice['reduction_type'])
+                if ('amount' == $specificPrice['reduction_type']) {
                     $discount["type"] = 0;
-                if ('percentage' == $specificPrice['reduction_type'])
+                    $discount['amount'] = $specificPrice['reduction'];
+                }
+
+                if ('percentage' == $specificPrice['reduction_type']) {
                     $discount["type"] = 1;
+                    $discount['amount'] = $specificPrice['reduction'] * 100;
+                }
 
                 array_push($discounts, $discount);
             }
@@ -339,17 +342,20 @@ class ProductUtiles
                 // if ($vSpecificPrice) {
                 if ($vSpecificPrice['price'] < 0) {
                     $vdiscount = array(
-                        'amount' => $vSpecificPrice['reduction'] * 100,
                         'start_date' => $vSpecificPrice['from'],
                         'end_date' => $vSpecificPrice['to'],
                         'quantity' => $vSpecificPrice['from_quantity'],
                         'tax' => $vSpecificPrice['reduction_tax']
                     );
-                    if ('amount' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 0;
+                    if ('amount' == $specificPrice['reduction_type']) {
+                        $discount["type"] = 0;
+                        $discount['amount'] = $specificPrice['reduction'];
+                    }
 
-                    if ('percentage' == $vSpecificPrice['reduction_type'])
-                        $vdiscount["type"] = 1;
+                    if ('percentage' == $specificPrice['reduction_type']) {
+                        $discount["type"] = 1;
+                        $discount['amount'] = $specificPrice['reduction'] * 100;
+                    }
                 }
             }
             $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
