@@ -267,11 +267,6 @@ class Shareino extends Module
         $productUtil = new ProductUtiles($this->context);
         $product = $productUtil->getProductDetailById($params['id_product']);
 
-        if ($product) {
-            if (isset($product['variants'][$params['id_product_attribute']]))
-                $product['variants'][$params['id_product_attribute']] = $params['quantity'];
-        }
-
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
             if ($result["status"])
