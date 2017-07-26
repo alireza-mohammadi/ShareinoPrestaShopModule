@@ -17,13 +17,14 @@
  * @copyright 2015-2016 Shareino Co
  *  Tejarat Ejtemaie Eram
  */
-
 require_once(dirname(__FILE__) . '/ShareinoSync.php');
 require_once(dirname(__FILE__) . '/OrganizeCategories.php');
 
 class ProductUtiles
 {
+
     public $context;
+
     const SHAREINO_API_URL = "https://shareino.ir/api/v1/public/";
 
     public function __construct($context)
@@ -67,13 +68,13 @@ class ProductUtiles
             return null;
     }
 
-
     public function syncProduct($productIds)
     {
         $products = array();
         $result = null;
         if (!is_array($productIds)) {
             $product = $this->getProductDetailById($productIds);
+
             if ($product && $product != null) {
                 $result = $this->sendRequset("products", "POST", Tools::jsonEncode($product));
             }
@@ -94,8 +95,6 @@ class ProductUtiles
             return $result;
         else
             return null;
-
-
     }
 
     public function bulkSync($ids, $product_ids = null)
@@ -178,7 +177,6 @@ class ProductUtiles
                     "code" => $httpcode,
                     "data" => $json["message"]);
             }
-
         } else {
             return array("status" => false,
                 "code" => 404,
@@ -189,7 +187,6 @@ class ProductUtiles
             "code" => 500,
             "data" => "عملیات با خطا مواجه شد لطفا مجدد تلاش فرمایید");
     }
-
 
     public function parsSyncResult($results, $productIds = null)
     {
@@ -347,14 +344,14 @@ class ProductUtiles
                         'quantity' => $vSpecificPrice['from_quantity'],
                         'tax' => $vSpecificPrice['reduction_tax']
                     );
-                    if ('amount' == $specificPrice['reduction_type']) {
-                        $discount["type"] = 0;
-                        $discount['amount'] = $specificPrice['reduction'];
+                    if ('amount' == $vSpecificPrice['reduction_type']) {
+                        $vdiscount["type"] = 0;
+                        $vdiscount['amount'] = $vSpecificPrice['reduction'];
                     }
 
-                    if ('percentage' == $specificPrice['reduction_type']) {
-                        $discount["type"] = 1;
-                        $discount['amount'] = $specificPrice['reduction'] * 100;
+                    if ('percentage' == $vSpecificPrice['reduction_type']) {
+                        $vdiscount["type"] = 1;
+                        $vdiscount['amount'] = $vSpecificPrice['reduction'] * 100;
                     }
                 }
             }
@@ -417,6 +414,35 @@ class ProductUtiles
         $priceWithoutReduct = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
 
 
+        $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0';
+        $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+        $discounts = array();
+        foreach ($specificPrices as $specificPrice) {
+//        if ($specificPrice) {
+            $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
+            if ($specificPrice['price'] < 0) {
+                $discount = array(
+                    'start_date' => $specificPrice['from'],
+                    'end_date' => $specificPrice['to'],
+                    'quantity' => $specificPrice['from_quantity'],
+                    'tax' => $specificPrice['reduction_tax']
+                );
+                if ('amount' == $specificPrice['reduction_type']) {
+                    $discount["type"] = 0;
+                    $discount['amount'] = $specificPrice['reduction'];
+                }
+
+                if ('percentage' == $specificPrice['reduction_type']) {
+                    $discount["type"] = 1;
+                    $discount['amount'] = $specificPrice['reduction'] * 100;
+                }
+
+                array_push($discounts, $discount);
+            }
+        }
+
+
         foreach ($vars as $var) {
             $groupName = Tools::strtolower($var["group_name"]);
             $groupName = str_replace(" ", "_", $groupName);
@@ -432,6 +458,32 @@ class ProductUtiles
             $variations[$var["id_product_attribute"]]["price"] = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC, $var["id_product_attribute"]);
 
 
+
+            $vdiscount = array();
+
+            $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"];
+            $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+            foreach ($specificPricess as $vSpecificPrice) {
+                if ($vSpecificPrice['price'] < 0) {
+                    $vdiscount = array(
+                        'start_date' => $vSpecificPrice['from'],
+                        'end_date' => $vSpecificPrice['to'],
+                        'quantity' => $vSpecificPrice['from_quantity'],
+                        'tax' => $vSpecificPrice['reduction_tax']
+                    );
+                    if ('amount' == $vSpecificPrice['reduction_type']) {
+                        $vdiscount["type"] = 0;
+                        $vdiscount['amount'] = $vSpecificPrice['reduction'];
+                    }
+
+                    if ('percentage' == $vSpecificPrice['reduction_type']) {
+                        $vdiscount["type"] = 1;
+                        $vdiscount['amount'] = $vSpecificPrice['reduction'] * 100;
+                    }
+                }
+            }
+            $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
         }
 
         // Get All Product Attributes
@@ -460,6 +512,7 @@ class ProductUtiles
             "sku" => $product->reference,
             "price" => $priceWithoutReduct,
             "active" => $product->active,
+            "discount" => $discounts,
             "sale_price" => "",
             "quantity" => Product::getQuantity($product->id),
             "weight" => $product->weight,
@@ -501,7 +554,6 @@ class ProductUtiles
         $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
 
         return Tools::jsonDecode($result, true);
-
     }
 
 }
