@@ -29,7 +29,7 @@
                             <br/>
 
                             <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
-                                        class="glyphicon glyphicon-cog"></span>
+                                    class="glyphicon glyphicon-cog"></span>
                                 تنظیمات ماژول</a>
                         </p>
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
@@ -65,8 +65,8 @@
                         </p>
 
                         <p style="font-size: 15px; font-weight: bolder;color: orangered" class="text-center">
-    نکته : مراحل فوق را فقط در ابتدای نصب ماژول و فقط یک بار لازم است انجام دهید
-</p>
+                            نکته : مراحل فوق را فقط در ابتدای نصب ماژول و فقط یک بار لازم است انجام دهید
+                        </p>
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
                             4. سینک تخفیف ها
                         </h2>
@@ -90,8 +90,8 @@
 
 
                     <div id="loadingBox" hidden class="text-center"><img
-                                src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
-                                alt="" title=""/>
+                            src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
+                            alt="" title=""/>
                     </div>
 
                     <div class="text-center" id="progress" hidden>
@@ -116,8 +116,7 @@
 {/if}
 
 <script>
-    $(document).ready(function () {
-
+    $(document).ready(function() {
         var productIDs ={$productIDs|json_encode};
 
         var lenght = productIDs.length;
@@ -132,11 +131,8 @@
         var syncFrom = $("#syncAllProductsForm");
         var submitBtn = $("#syncSumblit");
 
-
-        $("#sendCatsBtn").on('click', function () {
-
+        $("#sendCatsBtn").on('click', function() {
             $("#loadingBox").show();
-
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -146,44 +142,37 @@
                     ajax: true,
                     controller: 'AdminSynchronize',
                     action: 'SendCats',
-                    token: token,
-                },
-            }).done(function (data) {
+                    token: token
+                }
+            }).done(function(data) {
                 if (data.status) {
                     $("#loadingBox").hide();
                     messageBox.removeClass("alert-danger");
                     messageBox.addClass("alert-success");
                     messageText.html("تمامی دسته بندی ها با موفقیت ارسال شدند");
                     messageBox.show(500);
-                }
-                else {
+                } else {
                     $("#loadingBox").hide();
                     messageText.html(data.data);
                     messageBox.show(500);
                     messageBox.addClass("alert-danger");
                     stop = true;
                 }
-            }).fail(function () {
+            }).fail(function() {
 
             });
-
         });
 
 
-        $("#syncDiscount").on("click", function () {
-
+        $("#syncDiscount").on("click", function() {
             productIDs = {$productIDs|json_encode};
             lenght = productIDs.length;
             submitProgress.show();
-
-            $("#progress").show(500)
+            $("#progress").show(500);
             setPercentage();
-
             SyncDiscount();
-
         });
-        syncFrom.on("submit", function (event) {
-
+        syncFrom.on("submit", function(event) {
             // Cancel Submit
             event.preventDefault();
 
@@ -191,32 +180,22 @@
             lenght = productIDs.length;
 
             operation = syncFrom.attr("data-operation");
-
-
             submitProgress.show();
 
-            if (operation == "start") {
-
+            if (operation === "start") {
                 submitBtn.html("انصراف");
                 syncFrom.attr("data-operation", "stop");
                 stop = false;
                 $("#progress").show(500);
                 setPercentage();
-
-
-            }
-            else if (operation == "stop") {
+            } else if (operation === "stop") {
                 stopSync();
             }
-
             SyncProducts();
-
-
         });
 
 
         function SyncProducts() {
-            console.log(productIDs.length);
 
             if (productIDs.length <= 0) {
                 messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
@@ -229,7 +208,6 @@
 
             if (!stop) {
                 var IDs = productIDs.splice(0, chunk);
-
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -241,32 +219,37 @@
                         action: 'SyncProducts',
                         token: token,
                         ids: IDs
-                    },
-                }).done(function (data) {
+                    }
+                }).done(function(data) {
                     if (data.status) {
                         setPercentage();
                         SyncProducts();
+                    } else {
+                        switch (data.code) {
+                            case 403:
+                            case 401:
+                                message(false, "توکن وارد شده اشتباه است یا منقضی شده است");
+                                break;
+                            case 500:
+                                message(false, "خطا در پردازش داده در سمت شیرینو");
+                                break;
+                            case 408:
+                                message(false, "زمان درخواست منقضی شد");
+                                break;
+                            case 429:
+                            case 0:
+                                message(true, "فرایند هماهنگ سازی ممکن است مدتی طول بکشد لطفا صبور باشید");
+                                setTimeout(SyncProducts, 61 * 1000);
+                                break;
+                        }
                     }
-                    else {
-                        messageText.html(data.data);
-                        messageBox.show(500);
-                        messageBox.addClass("alert-danger");
-                        stop = false;
-                        submitProgress.css("width", "0%")
-                        submitProgress.css("width", "0%")
-                            .attr("aria-valuemin", "0%");
-                        $("#progress").hide(500);
-                    }
-                }).fail(function () {
+                }).fail(function() {
 
                 });
-
             }
         }
 
         function SyncDiscount() {
-
-
             if (productIDs.length <= 0) {
                 messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
                 messageBox.show(500);
@@ -289,42 +272,34 @@
                     action: 'SyncDiscounts',
                     token: token,
                     ids: IDs
-                },
-            }).done(function (data) {
+                }
+            }).done(function(data) {
                 if (data.status) {
                     setPercentage();
                     SyncDiscount();
-                }
-                else {
+                } else {
                     messageText.html(data.data);
                     messageBox.show(500);
                     messageBox.addClass("alert-danger");
                     submitProgress.css("width", "0%")
                     submitProgress.css("width", "0%")
-                        .attr("aria-valuemin", "0%");
+                            .attr("aria-valuemin", "0%");
                     $("#progress").hide(500);
                 }
-            }).fail(function () {
+            }).fail(function() {
 
             });
-
-
         }
 
         function setPercentage() {
-
             var percentage = Math.round(((lenght - productIDs.length) * 100) / lenght);
-
-
             percentage = percentage > 100 ? 100 : percentage;
-
             var text = " تعداد " + (lenght - productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
-
-            progressText.html(text)
+            progressText.html(text);
             submitProgress
-                .css("width", percentage + "%")
-                .attr("aria-valuemin", percentage + "%")
-                .html(percentage + "%");
+                    .css("width", percentage + "%")
+                    .attr("aria-valuemin", percentage + "%")
+                    .html(percentage + "%");
         }
 
         function l(log) {
@@ -332,16 +307,21 @@
         }
 
         function stopSync() {
-
             submitBtn.html("همسان سازی همه");
             syncFrom.attr("data-operation", "start");
 
             submitProgress.css("width", "0%")
             submitProgress.css("width", "0%")
-                .attr("aria-valuemin", "0%");
+                    .attr("aria-valuemin", "0%");
             $("#progress").hide(500);
             stop = true;
             lenght = productIDs.length;
+        }
+
+        function message(status, message) {
+            messageText.html(message);
+            messageBox.show(500);
+            messageBox.addClass(status ? 'alert-warning' : 'alert-danger');
         }
     });
 </script>
