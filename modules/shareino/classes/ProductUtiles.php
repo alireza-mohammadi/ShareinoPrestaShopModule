@@ -57,7 +57,7 @@ class ProductUtiles
             }
 
             if (!empty($products)) {
-				
+
                 $result = $this->sendRequset("discounts", "POST", Tools::jsonEncode($products));
                 if ($result["status"])
                     $this->parsSyncResult($result["status"], $productIds);
@@ -121,72 +121,65 @@ class ProductUtiles
      * @param null $body content of request like product
      * @return mixed | null
      */
-    public function sendRequset($url, $method, $body = null)
+   public function sendRequset($url, $method, $body = null)
     {
-
-        // Init curl
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-        // Generate url and set method in url
-        $url = self::SHAREINO_API_URL . $url;
-
-        curl_setopt($curl, CURLOPT_URL, $url);
-
-        // Set method in curl
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-
-        // Get token from site setting
+        // Get api token from server
         $SHAREINO_API_TOKEN = Configuration::get("SHAREINO_API_TOKEN");
 
+        if ($SHAREINO_API_TOKEN) {
 
-        // Check if token has been set then send request to {@link http://shareino.com}
-        if (!empty($SHAREINO_API_TOKEN)) {
+            // Init curl
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+            // SSL check
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+            // Generate url and set method in url
+            $url = self::SHAREINO_API_URL . $url;
+            curl_setopt($curl, CURLOPT_URL, $url);
+
+            // Set method in curl
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
 
             // Set Body if its exist
             if ($body != null) {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
             }
 
+            // Get result
             $shareinoModule = Module::getInstanceByName('shareino');
-
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    "Authorization:Bearer $SHAREINO_API_TOKEN",
-                    "User-Agent:PrestaShop_Module_$shareinoModule->version"
-                )
-            );
+                'Authorization:Bearer ' . $SHAREINO_API_TOKEN,
+                'User-Agent: PrestaShop_Module_' . $shareinoModule->version
+            ));
 
             // Get result
-            $result = curl_exec($curl);
+            curl_exec($curl);
 
             // Get Header Response header
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
 
-            if ($httpcode === 200) {
-                return array("status" => true,
-                    "code" => $httpcode,
-                    "data" => Tools::jsonDecode($result, true));
-            } else if ($httpcode === 401 || $httpcode === 403) {
-                return array("status" => false,
-                    "code" => $httpcode,
-                    "data" => "خطا ! لطفا صحت توکن و وضعیت دسترسی به وب سرویس شیرینو را بررسی کنید");
-            } else {
-                $json = Tools::jsonDecode($result, true);
-                return array("status" => $json["status"],
-                    "code" => $httpcode,
-                    "data" => $json["message"]);
+            switch ($httpcode) {
+                case 200:
+                    return array('status' => true, 'message' => 'ارسال به شرینو با موفقیت انجام شد.');
+                case 401:
+                    return array('status' => false, 'message' => 'خطا! توکن وارد شده معتبر نمیباشد.');
+                case 403:
+                    return array('status' => false, 'message' => 'خطا! دسترسی  مجاز نمیباشد.');
+                case 408:
+                    return array('status' => false, 'message' => 'خطا! درخواست منقضی شد.');
+                case 429:
+                case 0:
+                    return array('status' => false, 'code' => 429, 'message' => 'فرایند ارسال محصولات به طول می انجامد لطفا صبور باشید.');
+                default:
+                    return array('status' => false, 'message' => "error: $httpcode");
             }
-        } else {
-            return array("status" => false,
-                "code" => 404,
-                "data" => "لطفا توکن را در بخش تنظیمات ماژول شرینو وارد کنید");
         }
 
-        return array("status" => false,
-            "code" => 500,
-            "data" => "عملیات با خطا مواجه شد لطفا مجدد تلاش فرمایید");
+        return array('status' => false, 'message' => 'ابتدا توکن را از سرور شرینو دریافت کنید');
     }
 
     public function parsSyncResult($results, $productIds = null)

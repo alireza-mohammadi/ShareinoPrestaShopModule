@@ -103,26 +103,19 @@ class ShareinoSync extends ObjectModel
 
     public function getProductsIds($ids, $all = false)
     {
-        if ($ids != null) {
+       if ($ids != null) {
             $ids = implode(", ", $ids);
-        } else {
-            $all = true;
         }
 
-        $query = "SELECT `product_id` from " . _DB_PREFIX_ . "shareino_sync";
-
-        $query .= !$all ? " WHERE id_shareino_sync in ($ids)" : "";
-
+        $query = "SELECT `id_product` FROM `" . _DB_PREFIX_ . "product` WHERE `active`=1 ORDER BY `id_product` ASC";
         $product_ids = Db::getInstance()->executeS($query);
-
-        $ids = array();
+        $lists = array();
 
         foreach ($product_ids as $pid) {
-            $ids[] = $pid["product_id"];
+            $lists[] = $pid["id_product"];
         }
 
-        return $ids;
-
+        return $lists;
     }
 
     public function changeProductsStatus($ids, $status = 0, $all = false)

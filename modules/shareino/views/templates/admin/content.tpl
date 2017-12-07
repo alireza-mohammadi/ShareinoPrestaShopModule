@@ -221,27 +221,16 @@
                         ids: IDs
                     }
                 }).done(function(data) {
-                    if (data.status) {
+                    if (data.status === false) {
+                        if (data.code === 429 || data.code === 0) {
+                            message(true, "فرایند هماهنگ سازی ممکن است مدتی طول بکشد لطفا صبور باشید");
+                            setTimeout(SyncProducts, 61 * 1000);
+                        } else {
+                            message(data.status, data.message);
+                        }
+                    } else {
                         setPercentage();
                         SyncProducts();
-                    } else {
-                        switch (data.code) {
-                            case 403:
-                            case 401:
-                                message(false, "توکن وارد شده اشتباه است یا منقضی شده است");
-                                break;
-                            case 500:
-                                message(false, "خطا در پردازش داده در سمت شیرینو");
-                                break;
-                            case 408:
-                                message(false, "زمان درخواست منقضی شد");
-                                break;
-                            case 429:
-                            case 0:
-                                message(true, "فرایند هماهنگ سازی ممکن است مدتی طول بکشد لطفا صبور باشید");
-                                setTimeout(SyncProducts, 61 * 1000);
-                                break;
-                        }
                     }
                 }).fail(function() {
 
