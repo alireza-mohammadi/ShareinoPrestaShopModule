@@ -55,7 +55,8 @@ class AdminSynchronizeController extends ModuleAdminController
         // Update the SQL request of the HelperList
         $this->_select = "pl.`name` as product_name";
         $this->_join = 'LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.`id_product` = a.`product_id` AND pl.`id_lang` = ' . (int)$this->context->language->id . ')';
-// Add bulk actions
+
+        // Add bulk actions
         $this->bulk_actions = array(
             'synchronizeAction' => array(
                 'text' => $this->l('همسان سازی'), 'confirm' => $this->l('Are you sure?'),

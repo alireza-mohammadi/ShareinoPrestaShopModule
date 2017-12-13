@@ -20,6 +20,7 @@
  */
 class OrganizeCategories extends ObjectModel
 {
+
     public $id_shareino_categories;
     public $cat_id;
     public $ids;
@@ -95,8 +96,7 @@ class OrganizeCategories extends ObjectModel
         $notmatching = array();
         foreach ($categories as $category) {
             $categoriesIds[] = $category["id_category"];
-            $notmatching[$category["id_category"]]
-                = array($category["link_rewrite"] => $category["name"]);
+            $notmatching[$category["id_category"]] = array($category["link_rewrite"] => $category["name"]);
         }
 
         if (empty($categoriesIds)) {
@@ -117,8 +117,7 @@ class OrganizeCategories extends ObjectModel
         if ($result) {
             foreach ($result as $item) {
                 $productCategories["matching"] = array_merge(
-                    $productCategories["matching"],
-                    explode(",", $item["ids"])
+                    $productCategories["matching"], explode(",", $item["ids"])
                 );
 
                 unset($notmatching[$item["cat_id"]]);
@@ -140,4 +139,5 @@ class OrganizeCategories extends ObjectModel
 
         return Db::getInstance()->query($sql);
     }
+
 }

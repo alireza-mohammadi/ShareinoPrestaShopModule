@@ -17,17 +17,17 @@
  * @copyright 2015-2016 Shareino Co
  * Tejarat Ejtemaie Eram
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 require_once (dirname(__FILE__) . '/classes/ShareinoSync.php');
 require_once (dirname(__FILE__) . '/classes/ProductUtiles.php');
-require_once (dirname(__FILE__) .'/controllers/admin/AdminSynchronizeController.php');
+require_once (dirname(__FILE__) . '/controllers/admin/AdminSynchronizeController.php');
 
 class Shareino extends Module
 {
+
     protected $config_form = false;
 
     public function __construct()
@@ -216,7 +216,6 @@ class Shareino extends Module
 
         $sync = new ShareinoSync();
         $sync->deleteProduct($product_id);
-
     }
 
     public function hookActionProductSave($params)
@@ -272,7 +271,6 @@ class Shareino extends Module
             if ($result["status"])
                 $productUtil->parsSyncResult($result["data"], $params['id_product']);
         }
-
     }
 
     public function hookActionProductUpdate($params)
@@ -303,6 +301,6 @@ class Shareino extends Module
         $tab->id_parent = $parent_tab->id;
         $tab->module = $this->name;
         $tab->add();
-
     }
+
 }

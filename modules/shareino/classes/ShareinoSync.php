@@ -20,6 +20,7 @@
  */
 class ShareinoSync extends ObjectModel
 {
+
     public $id_shareino_sync;
     public $product_id;
     public $status;
@@ -70,7 +71,6 @@ class ShareinoSync extends ObjectModel
         }
 
 //        $tbl=_DB_PREFIX_.$this->def['table'];
-
 //        $sql = "INSERT INTO $tbl (`product_id`,`status`,`errors`,`date_add`) VALUES ($this->product_id,$this->status,'$this->errors',$this->data_add)
 //        ON DUPLICATE KEY UPDATE status=$this->status,errors='$this->errors',date_upd=$this->date_upd";
 
@@ -103,7 +103,7 @@ class ShareinoSync extends ObjectModel
 
     public function getProductsIds($ids, $all = false)
     {
-       if ($ids != null) {
+        if ($ids != null) {
             $ids = implode(", ", $ids);
         }
 
@@ -128,4 +128,5 @@ class ShareinoSync extends ObjectModel
 
         return Db::getInstance()->execute($query);
     }
+
 }
