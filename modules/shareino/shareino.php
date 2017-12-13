@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.3.6';
+        $this->version = '1.3.7';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -72,6 +72,9 @@ class Shareino extends Module
 
     public function uninstall()
     {
+        $productUtiles = new ProductUtiles($this->context);
+        $productUtiles->sendRequset('status', 'POST', null);
+
         include(dirname(__FILE__) . '/sql/uninstall.php');
 
         // Uninstall Tabs
