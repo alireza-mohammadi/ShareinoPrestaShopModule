@@ -25,7 +25,7 @@ class ProductUtiles
 
     public $context;
 
-    const SHAREINO_API_URL = "https://shareino.ir/api/v1/public/";
+    const SHAREINO_API_URL = "https://dokme.com/api/v1/public/";
 
     public function __construct($context)
     {
@@ -447,7 +447,7 @@ class ProductUtiles
                 "label" => $var["group_name"],
                 "value" => $var["attribute_name"]
             );
-
+            $variations[$var["id_product_attribute"]]["sku"] = $var["reference"];
             $variations[$var["id_product_attribute"]]["code"] = $var["id_product_attribute"];
             $variations[$var["id_product_attribute"]]["default_value"] = $var["default_on"];
             $variations[$var["id_product_attribute"]]["quantity"] = $var["quantity"];
