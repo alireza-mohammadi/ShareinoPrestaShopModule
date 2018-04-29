@@ -282,7 +282,7 @@ class ProductUtiles
 
         // $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
-                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0';
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0 AND id_group IN(0, 1, 2)';
         $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
         $discounts = array();
         foreach ($specificPrices as $specificPrice) {
@@ -327,7 +327,7 @@ class ProductUtiles
                 , $var["id_product_attribute"]);
 
             $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
-                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"];
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"] . 'AND id_group IN(0, 1, 2)';
             $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
 ////            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
             foreach ($specificPricess as $vSpecificPrice) {
@@ -411,7 +411,7 @@ class ProductUtiles
 
 
         $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
-                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0';
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0 AND id_group IN(0, 1, 2)';
         $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
         $discounts = array();
         foreach ($specificPrices as $specificPrice) {
@@ -458,7 +458,7 @@ class ProductUtiles
             $vdiscount = array();
 
             $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
-                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"];
+                WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"] . 'AND id_group IN(0, 1, 2)';
             $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
             foreach ($specificPricess as $vSpecificPrice) {
                 if ($vSpecificPrice['price'] < 0) {
