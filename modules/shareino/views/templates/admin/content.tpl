@@ -29,16 +29,17 @@
                             <br/>
 
                             <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
-                                    class="glyphicon glyphicon-cog"></span>
+                                        class="glyphicon glyphicon-cog"></span>
                                 تنظیمات ماژول</a>
                         </p>
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
 
 
-                            2. سینک دسته بندی ها                        </h2>
+                            2. سینک دسته بندی ها </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            قبل از ارسال محصولات به شرینو ، لازم است در ابتدا دسته بندی های خود رو جهت همسان سازی با شرینو ، ارسال کنید .
+                            قبل از ارسال محصولات به شرینو ، لازم است در ابتدا دسته بندی های خود رو جهت همسان سازی با
+                            شرینو ، ارسال کنید .
                             <br/>
                             <button type="button" class="btn btn-default" name="shareino_send_categories"
                                     id="sendCatsBtn">
@@ -51,7 +52,7 @@
 
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
 
-                            3. سینک محصولات                        </h2>
+                            3. سینک محصولات </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
                             برای همسان سازی کالاها بر روی دکمه زیر کلیک کنید
@@ -73,7 +74,8 @@
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
 
-                            اگر تخفیف فعالی در فروشگاه خود دارید برای همسان سازی و ارسال تخفیف ها به شرینو از این گزینه استفاده کنید .
+                            اگر تخفیف فعالی در فروشگاه خود دارید برای همسان سازی و ارسال تخفیف ها به شرینو از این گزینه
+                            استفاده کنید .
                             بعد از هر بار تغییر در تخفیف ها لازم است ، همسان سازی تخفیف ها را مجددا انجام دهید .
 
                             <br/>
@@ -90,8 +92,8 @@
 
 
                     <div id="loadingBox" hidden class="text-center"><img
-                            src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
-                            alt="" title=""/>
+                                src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
+                                alt="" title=""/>
                     </div>
 
                     <div class="text-center" id="progress" hidden>
@@ -116,7 +118,7 @@
 {/if}
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var productIDs ={$productIDs|json_encode};
 
         var lenght = productIDs.length;
@@ -131,7 +133,7 @@
         var syncFrom = $("#syncAllProductsForm");
         var submitBtn = $("#syncSumblit");
 
-        $("#sendCatsBtn").on('click', function() {
+        $("#sendCatsBtn").on('click', function () {
             $("#loadingBox").show();
             $.ajax({
                 type: 'POST',
@@ -144,7 +146,7 @@
                     action: 'SendCats',
                     token: token
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 if (data.status) {
                     $("#loadingBox").hide();
                     messageBox.removeClass("alert-danger");
@@ -158,13 +160,13 @@
                     messageBox.addClass("alert-danger");
                     stop = true;
                 }
-            }).fail(function() {
+            }).fail(function () {
 
             });
         });
 
 
-        $("#syncDiscount").on("click", function() {
+        $("#syncDiscount").on("click", function () {
             productIDs = {$productIDs|json_encode};
             lenght = productIDs.length;
             submitProgress.show();
@@ -172,7 +174,7 @@
             setPercentage();
             SyncDiscount();
         });
-        syncFrom.on("submit", function(event) {
+        syncFrom.on("submit", function (event) {
             // Cancel Submit
             event.preventDefault();
 
@@ -220,7 +222,7 @@
                         token: token,
                         ids: IDs
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     if (data.status === false) {
                         if (data.code === 429 || data.code === 0) {
                             message(true, "فرایند هماهنگ سازی ممکن است مدتی طول بکشد لطفا صبور باشید");
@@ -232,7 +234,7 @@
                         setPercentage();
                         SyncProducts();
                     }
-                }).fail(function() {
+                }).fail(function () {
 
                 });
             }
@@ -262,7 +264,7 @@
                     token: token,
                     ids: IDs
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 if (data.status) {
                     setPercentage();
                     SyncDiscount();
@@ -272,10 +274,10 @@
                     messageBox.addClass("alert-danger");
                     submitProgress.css("width", "0%")
                     submitProgress.css("width", "0%")
-                            .attr("aria-valuemin", "0%");
+                        .attr("aria-valuemin", "0%");
                     $("#progress").hide(500);
                 }
-            }).fail(function() {
+            }).fail(function () {
 
             });
         }
@@ -286,9 +288,9 @@
             var text = " تعداد " + (lenght - productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
             progressText.html(text);
             submitProgress
-                    .css("width", percentage + "%")
-                    .attr("aria-valuemin", percentage + "%")
-                    .html(percentage + "%");
+                .css("width", percentage + "%")
+                .attr("aria-valuemin", percentage + "%")
+                .html(percentage + "%");
         }
 
         function l(log) {
@@ -301,7 +303,7 @@
 
             submitProgress.css("width", "0%")
             submitProgress.css("width", "0%")
-                    .attr("aria-valuemin", "0%");
+                .attr("aria-valuemin", "0%");
             $("#progress").hide(500);
             stop = true;
             lenght = productIDs.length;

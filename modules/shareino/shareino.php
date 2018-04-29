@@ -21,9 +21,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once (dirname(__FILE__) . '/classes/ShareinoSync.php');
-require_once (dirname(__FILE__) . '/classes/ProductUtiles.php');
-require_once (dirname(__FILE__) . '/controllers/admin/AdminSynchronizeController.php');
+require_once(dirname(__FILE__) . '/classes/ShareinoSync.php');
+require_once(dirname(__FILE__) . '/classes/ProductUtiles.php');
+require_once(dirname(__FILE__) . '/controllers/admin/AdminSynchronizeController.php');
 
 class Shareino extends Module
 {

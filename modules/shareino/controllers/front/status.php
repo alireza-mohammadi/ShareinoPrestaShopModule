@@ -2,7 +2,6 @@
 
 class ShareinoStatusModuleFrontController extends ModuleFrontController
 {
-
     public function initContent()
     {
         parent::initContent();
@@ -13,5 +12,4 @@ class ShareinoStatusModuleFrontController extends ModuleFrontController
 
         $this->setTemplate('status.tpl');
     }
-
 }
