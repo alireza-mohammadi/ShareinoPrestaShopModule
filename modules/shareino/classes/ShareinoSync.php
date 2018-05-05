@@ -107,12 +107,25 @@ class ShareinoSync extends ObjectModel
             $ids = implode(", ", $ids);
         }
 
-        $query = "SELECT `id_product` FROM `" . _DB_PREFIX_ . "product` WHERE `active`=1 ORDER BY `id_product` ASC";
+        $tblProduct = _DB_PREFIX_ . 'product';
+        $tblCategoryProduct = _DB_PREFIX_ . 'category_product';
+
+        $query = "SELECT `id_product` FROM `$tblProduct` WHERE `active` = 1 ORDER BY `id_product` ASC";
+
+        $category = json_decode(Configuration::get('SHAREINO_SELECT_CATEGORY'), true);
+        if (!empty($category)) {
+            $category = implode(',', $category);
+
+            $query = "SELECT DISTINCT `$tblProduct`.`id_product` FROM `$tblProduct` 
+                  INNER JOIN `$tblCategoryProduct` ON `$tblCategoryProduct` . `id_product` = `$tblProduct` . `id_product` 
+                  WHERE `$tblCategoryProduct` . `id_category` IN($category) AND `$tblProduct` . `active` = 1 ORDER BY `id_product` ASC";
+        }
+
         $product_ids = Db::getInstance()->executeS($query);
         $lists = array();
 
         foreach ($product_ids as $pid) {
-            $lists[] = $pid["id_product"];
+            $lists[] = $pid['id_product'];
         }
 
         return $lists;
@@ -120,11 +133,10 @@ class ShareinoSync extends ObjectModel
 
     public function changeProductsStatus($ids, $status = 0, $all = false)
     {
-
         $ids = implode(", ", $ids);
-        $query = "UPDATE " . _DB_PREFIX_ . "shareino_sync SET status=$status";
+        $query = "UPDATE " . _DB_PREFIX_ . "shareino_sync SET status = $status";
 
-        $query .= !$all ? " WHERE id_shareino_sync in ($ids);" : " WHERE 1;";
+        $query .= !$all ? " WHERE id_shareino_sync in($ids);" : " WHERE 1;";
 
         return Db::getInstance()->execute($query);
     }

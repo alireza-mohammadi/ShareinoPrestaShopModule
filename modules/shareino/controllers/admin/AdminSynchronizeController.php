@@ -25,7 +25,6 @@ class AdminSynchronizeController extends ModuleAdminController
 
     public function __construct()
     {
-
         $this->module = 'shareino';
         $this->table = 'shareino_sync';
         $this->context = Context::getContext();
@@ -38,14 +37,10 @@ class AdminSynchronizeController extends ModuleAdminController
         $this->context->controller->addJS('js/jquery/plugins/select2/select2_locale_fa.js', 'all');
 
         $this->fields_list = array(
-            'id_shareino_sync' => array('title' => 'ID',
-                'align' => 'center', 'width' => 25),
-            'product_id' => array('title' => 'Product ID',
-                'width' => 25, 'search' => true),
-            'product_name' => array('title' => 'Name',
-                'width' => 300, 'search' => false),
-            'status' => array('title' => 'Synced', 'width'
-            => 100, 'type' => 'bool'),
+            'id_shareino_sync' => array('title' => 'ID', 'align' => 'center', 'width' => 25),
+            'product_id' => array('title' => 'Product ID', 'width' => 25, 'search' => true),
+            'product_name' => array('title' => 'Name', 'width' => 300, 'search' => false),
+            'status' => array('title' => 'Synced', 'width' => 100, 'type' => 'bool'),
             'errors' => array('title' => 'Errors', 'width' => 300, 'search' => false),
             'date_upd' => array('title' => 'Date Update', 'type' => 'datetime', 'search' => false)
         );

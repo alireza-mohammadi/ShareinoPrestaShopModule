@@ -34,7 +34,7 @@ class Shareino extends Module
     {
         $this->name = 'shareino';
         $this->tab = 'export';
-        $this->version = '1.3.8';
+        $this->version = '1.3.9';
         $this->author = 'Saeed Darvish';
         $this->need_instance = 1;
         $this->module_key = '84e0bc5da856da1c414762d8fdfe9a71';
@@ -67,7 +67,8 @@ class Shareino extends Module
             $this->registerHook('actionUpdateQuantity') &&
             $this->registerHook('actionCategoryAdd') &&
             $this->registerHook('actionObjectCategoryUpdateAfter') &&
-            $this->registerHook('actionCategoryDelete');
+            $this->registerHook('actionCategoryDelete') &&
+            $this->registerHook('actionObjectProductUpdateAfter');
     }
 
     public function uninstall()
@@ -231,6 +232,12 @@ class Shareino extends Module
             return;
         }
 
+        $selectCategory = $this->_checkSelectedCategory($product_id);
+        if (!$selectCategory) {
+            $this->hookActionProductDelete($params);
+            return;
+        }
+
         if (ConfigurationCore::get("SHAREINO_SENT_CATS") !== true) {
 
             $categories = CategoryCore::getNestedCategories(null, $this->context->language->id);
@@ -278,7 +285,6 @@ class Shareino extends Module
 
     public function hookActionProductUpdate($params)
     {
-
         $this->hookActionProductSave($params);
     }
 
@@ -304,6 +310,42 @@ class Shareino extends Module
         $tab->id_parent = $parent_tab->id;
         $tab->module = $this->name;
         $tab->add();
+
+        $tab = new Tab();
+        // Need a foreach for the language
+        $tab->name[$this->context->language->id] = $this->l('تنظیمات ارسال کالاها');
+        $tab->class_name = 'AdminManageCats';
+        $tab->id_parent = $parent_tab->id;
+        $tab->module = $this->name;
+        $tab->add();
     }
 
+    protected function _checkSelectedCategory($productId)
+    {
+        $category = json_decode(Configuration::get('SHAREINO_SELECT_CATEGORY'), true);
+
+        if ($category) {
+            $category = implode(',', $category);
+
+            $tblProduct = _DB_PREFIX_ . 'product';
+            $tblCategoryProduct = _DB_PREFIX_ . 'category_product';
+
+            $query = "SELECT `$tblProduct`.`id_product` FROM `$tblProduct`
+                  INNER JOIN `$tblCategoryProduct` ON `$tblCategoryProduct` . `id_product` = `$tblProduct` . `id_product`
+                  WHERE `$tblProduct` . `id_product`= $productId AND `$tblProduct` . `active` = 1
+                  AND `$tblCategoryProduct` . `id_category` IN($category)";
+
+            $id = Db::getInstance()->executeS($query);
+
+            if (empty($id)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function hookActionObjectProductUpdateAfter($params)
+    {
+        $this->hookActionProductSave($params);
+    }
 }

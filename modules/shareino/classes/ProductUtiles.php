@@ -533,21 +533,8 @@ class ProductUtiles
     public function deleteProducts($ids, $all = false)
     {
         $body = array();
-        $url = "products";
-
-        // Chek if want to delete All product
-        if ($all) {
-            $body = array("type" => "all");
-        } else {
-            if (is_array($ids)) {
-                $body = array("type" => "selected", "code" => $ids);
-            } else {
-                $url .= "/$ids";
-            }
-        }
-
-        $result = $this->sendRequset($url, "DELETE", Tools::jsonEncode($body));
-
+        $url = "products/$ids";
+        $result = $this->sendRequset($url, 'DELETE', Tools::jsonEncode($body));
         return Tools::jsonDecode($result, true);
     }
 
