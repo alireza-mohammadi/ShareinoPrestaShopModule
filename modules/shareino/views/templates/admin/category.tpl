@@ -37,16 +37,6 @@
         var messageBox = $("#syncMessageBox");
         var messageText = $("#syncMessageText");
         var token = $('#saveCategoryForm').attr('data-token');
-        var selectedCategory = {$category};
-
-        $(selectedCategory).each(function (i) {
-            $('input[type=checkbox]').each(function () {
-                if (($(this).val() == selectedCategory[i])) {
-                    $(this).attr('checked', 'checked');
-                }
-            });
-
-        });
 
         $('#saveCategory').on('click', function () {
             var categories = [];

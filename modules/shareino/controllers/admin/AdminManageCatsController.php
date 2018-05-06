@@ -43,6 +43,7 @@ class AdminManageCatsController extends ModuleAdminController
         $tree = new HelperTreeCategoriesCore('associated-categories-tree', 'دسته بندی های فروشگاه');
         $tree->setUseCheckBox(true);
         $tree->setInputName('storeCategory');
+        $tree->setSelectedCategories($this->getSelectedCategories());
         $this->context->smarty->assign('storeCategoryBox', $tree->render());
 
         // Assign controller's url
@@ -51,14 +52,13 @@ class AdminManageCatsController extends ModuleAdminController
         $this->context->smarty->assign('url', $action);
 
         $this->context->smarty->assign(array(
-            'token' => Tools::getAdminTokenLite('AdminManageCats'),
-            'category' => Configuration::get('SHAREINO_SELECT_CATEGORY')
+            'token' => Tools::getAdminTokenLite('AdminManageCats')
         ));
 
         $this->context->smarty->assign('list', $this->renderList());
     }
 
-    function ajaxProcessSelectedCategories()
+    public function ajaxProcessSelectedCategories()
     {
         $category = json_encode(Tools::getValue('categories'), true);
         $result = Configuration::updateValue('SHAREINO_SELECT_CATEGORY', $category);
@@ -68,6 +68,14 @@ class AdminManageCatsController extends ModuleAdminController
         } else {
             echo json_encode(array('status' => false, 'message' => 'خطایی در ذخیره‌سازی وجود دارد.'));
         }
+    }
 
+    protected function getSelectedCategories()
+    {
+        $selectedCategories = Configuration::get('SHAREINO_SELECT_CATEGORY');
+        if (empty($selectedCategories)) {
+            return [];
+        }
+        return Tools::jsonDecode($selectedCategories);
     }
 }
