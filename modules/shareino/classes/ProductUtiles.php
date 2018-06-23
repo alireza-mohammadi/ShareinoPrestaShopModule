@@ -185,42 +185,7 @@ class ProductUtiles
 
     public function parsSyncResult($results, $productIds = null)
     {
-        $results = Tools::jsonDecode($results, true);
-
-        if ($results != null) {
-            if (is_array($results)) {
-
-                foreach ($results as $result) {
-
-                    if (!isset($result["code"]) | $result["code"] == null) {
-                        continue;
-                    }
-                    $shsync = new ShareinoSync($this->context);
-                    $shsync->product_id = $result["code"];
-                    $shsync->status = $result["status"];
-
-                    $shsync->errors = isset($result["errors"]) & !empty($result["errors"]) ?
-                        implode(", ", $result["errors"]) : "";
-                    $shsync->syncLocalField();
-                }
-            }
-            return;
-        } else {
-
-            foreach ($productIds as $ids) {
-                if (!isset($result["code"]) | $result["code"] == null) {
-                    continue;
-                }
-                $shsync = new ShareinoSync($this->context);
-                $shsync->product_id = $ids;
-                $shsync->status = false;
-                $shsync->errors = implode(", ", $results["messages"]);
-                $shsync->syncLocalField();
-            }
-            return;
-        }
-
-        $this->setAllFailure($productIds);
+        return;
     }
 
     public function setAllFailure($productIds)
@@ -459,6 +424,7 @@ class ProductUtiles
 
             $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
                 WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"] . 'AND id_group IN(0, 1, 2)';
+            
             $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
             foreach ($specificPricess as $vSpecificPrice) {
                 if ($vSpecificPrice['price'] < 0) {
