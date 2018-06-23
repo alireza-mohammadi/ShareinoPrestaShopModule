@@ -4,6 +4,14 @@ require_once _PS_MODULE_DIR_ . 'shareino/classes/dokmeAuth.php';
 
 class ShareinoEmptyModuleFrontController extends ModuleFrontController
 {
+    public function __construct($response = array())
+    {
+        parent::__construct($response);
+        $this->display_header = false;
+        $this->display_header_javascript = false;
+        $this->display_footer = false;
+    }
+
     public function initContent()
     {
         parent::initContent();
@@ -19,7 +27,5 @@ class ShareinoEmptyModuleFrontController extends ModuleFrontController
 
             echo Tools::jsonEncode(['status' => true, 'message' => 'دیتابیس خالی شد.'], true);
         }
-
-        $this->setTemplate();
     }
 }

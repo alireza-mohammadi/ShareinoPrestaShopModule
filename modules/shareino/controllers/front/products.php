@@ -7,6 +7,14 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
 {
     const SIZE = 100;
 
+    public function __construct($response = array())
+    {
+        parent::__construct($response);
+        $this->display_header = false;
+        $this->display_header_javascript = false;
+        $this->display_footer = false;
+    }
+
     public function initContent()
     {
         parent::initContent();
@@ -49,8 +57,6 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
             $query = "UPDATE `$tblSync` SET `date_sync`='$time' WHERE `product_id` IN ($ids)";
             Db::getInstance()->execute($query);
         }
-
-        $this->setTemplate();
     }
 
     protected function array_pluck($array, $column_name)

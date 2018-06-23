@@ -5,6 +5,14 @@ require_once _PS_MODULE_DIR_ . 'shareino/classes/dokmeAuth.php';
 
 class ShareinoProductModuleFrontController extends ModuleFrontController
 {
+    public function __construct($response = array())
+    {
+        parent::__construct($response);
+        $this->display_header = false;
+        $this->display_header_javascript = false;
+        $this->display_footer = false;
+    }
+
     public function initContent()
     {
         parent::initContent();
@@ -48,8 +56,6 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
             }
             Db::getInstance()->execute($query);
         }
-
-        $this->setTemplate();
     }
 
     protected function checkCategory($id)
