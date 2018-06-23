@@ -20,29 +20,30 @@ class ShareinoCategoryModuleFrontController extends ModuleFrontController
 
         $auth = new dokmeAuth();
         if ($auth->auth()) {
-            $categories = CategoryCore::getNestedCategories(
+
+            $nestedCategories = CategoryCore::getNestedCategories(
                 null,
                 $this->context->language->id
             );
-            $data['data'] = $this->treeCategories($categories);
+            $categories = array();
+            $this->treeCategories($nestedCategories, $categories);
+            $data['data'] = $categories;
             echo Tools::jsonEncode($data);
+
         }
     }
 
-    protected function treeCategories($categories, $data = array())
+    protected function treeCategories($nestedCategories, &$categories)
     {
-        foreach ($categories as $category) {
-            $data[] = array(
+        foreach ($nestedCategories as $category) {
+            $categories[] = array(
                 'id' => $category['id_category'],
                 'parent_id' => $category['id_parent'],
                 'name' => $category['name']
             );
-
             if (!empty($category['children'])) {
-                return $this->treeCategories($category['children'], $data);
+                $this->treeCategories($category['children'], $categories);
             }
         }
-
-        return $data;
     }
 }
