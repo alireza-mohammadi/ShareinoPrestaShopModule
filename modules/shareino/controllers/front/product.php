@@ -14,16 +14,21 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
         $auth = new dokmeAuth();
         if ($auth->auth()) {
 
+            if (!isset($_GET['id'])) {
+                echo Tools::jsonEncode(['status' => false, 'message' => 'error'], true);
+                return;
+            }
+
             $tblProduct = _DB_PREFIX_ . 'product';
-            $id = Db::getInstance()->execute("SELECT `id_product` FROM `$tblProduct` WHERE `$tblProduct`.`active` = 1");
+            $id = Db::getInstance()->execute("SELECT `id_product` FROM `$tblProduct` WHERE `$tblProduct`.`active` = 1 AND `id_product`=" . $_GET['id']);
 
             if (empty($id)) {
-                echo Tools::jsonEncode(['status' => false, 'message' => 'no query result.'], true);
+                echo Tools::jsonEncode(['status' => false, 'message' => 'کالایی با این ایدی پیدا نشد.'], true);
                 return;
             }
 
             if (!$this->checkCategory($id)) {
-                echo Tools::jsonEncode(['status' => false, 'message' => 'no category select.'], true);
+                echo Tools::jsonEncode(['status' => false, 'message' => 'در دسته بندی انتخاب شده نیست.'], true);
                 return;
             }
 

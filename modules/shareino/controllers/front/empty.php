@@ -17,7 +17,7 @@ class ShareinoEmptyModuleFrontController extends ModuleFrontController
 
             Db::getInstance()->execute("INSERT IGNORE INTO $tblSync(`product_id`) SELECT `id_product` AS `product_id` FROM $tblProduct");
 
-            echo Tools::jsonEncode(['status' => true, 'message' => 'empty db'], true);
+            echo Tools::jsonEncode(['status' => true, 'message' => 'دیتابیس خالی شد.'], true);
         }
 
         $this->setTemplate();

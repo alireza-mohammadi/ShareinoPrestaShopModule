@@ -29,7 +29,8 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
             $ids = Db::getInstance()->executeS($query);
 
             if (empty($ids)) {
-                echo Tools::jsonEncode(['status' => false, 'message' => 'no query result.'], true);
+                echo Tools::jsonEncode(['status' => false, 'message' => 'کالایی با این ایدی پیدا نشد.'], true);
+                return;
             }
 
             // get product detail
