@@ -7,9 +7,9 @@ class ShareinoStatusModuleFrontController extends ModuleFrontController
         parent::initContent();
 
         if (Module::isInstalled('shareino')) {
-            echo json_encode(['status' => true], true);
+            echo Tools::jsonEncode(['status' => true], true);
         }
 
-        $this->setTemplate('status.tpl');
+        $this->setTemplate();
     }
 }

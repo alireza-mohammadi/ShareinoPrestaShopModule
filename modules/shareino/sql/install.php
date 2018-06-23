@@ -18,9 +18,9 @@
  *  Tejarat Ejtemaie Eram
  */
 
-$sql = array();
+$tables = array();
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_sync` (
+$tables[] = 'CREATE TABLE IF NOT EXISTS  `' . _DB_PREFIX_ . 'shareino_sync` (
   `id_shareino_sync` INT NOT NULL AUTO_INCREMENT,
   `product_id` INT NOT NULL,
   `status` TINYINT NULL,
@@ -30,12 +30,20 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS  `'._DB_PREFIX_.'shareino_sync` (
   PRIMARY KEY (`id_shareino_sync`),
   UNIQUE INDEX `product_id_UNIQUE` (`product_id` ASC))DEFAULT CHARSET=utf8;';
 
-$sql[] = 'INSERT IGNORE INTO  `'._DB_PREFIX_.'shareino_sync` (`product_id`,`status`)
+$tables[] = 'INSERT IGNORE INTO  `' . _DB_PREFIX_ . 'shareino_sync` (`product_id`,`status`)
             SELECT `id_product` AS `product_id`,0 AS `status`
-            from  `'._DB_PREFIX_.'product`;';
+            FROM  `' . _DB_PREFIX_ . 'product`;';
 
-foreach ($sql as $query) {
-    if (Db::getInstance()->execute($query) == false) {
+$tables[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'dokme_synchronize`(
+            `id` BIGINT NOT NULL AUTO_INCREMENT,
+            `product_id` BIGINT NOT NULL,
+            `date_sync` DATETIME NOT NULL,
+             PRIMARY KEY(`id`))';
+
+$tables[] = 'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'dokme_synchronize`(`product_id`) SELECT `id_product` AS `product_id` FROM `' . _DB_PREFIX_ . 'product`';
+
+foreach ($tables as $table) {
+    if (Db::getInstance()->execute($table) === false) {
         return false;
     }
 }

@@ -53,6 +53,10 @@ class Shareino extends Module
         if ($token == "" || $token == null) {
             $this->warning = $this->l('Shareino Token hasn\'t been set yet');
         }
+
+        if (empty(Configuration::get('SELLER_TOKEN'))) {
+            Configuration::updateValue('SELLER_TOKEN', bin2hex(static::randomBytes(20)));
+        }
     }
 
     public function install()
@@ -146,9 +150,18 @@ class Shareino extends Module
                         'col' => 9,
                         'type' => 'text',
                         'prefix' => '<i class="icon icon-key"></i>',
-                        'desc' => $this->l('Enter Shareino\'s webservice token'),
+                        'desc' => $this->l('توکن دریافتی خود از دکمه را در اینجا وارد کنید.'),
                         'name' => 'SHAREINO_API_TOKEN',
-                        'label' => $this->l('Shareino Token'),
+                        'label' => $this->l('توکن دریافتی از دکمه'),
+                    ),
+                    array(
+                        'col' => 4,
+                        'type' => 'text',
+                        'prefix' => '<i class="icon icon-stop"></i>',
+                        'desc' => $this->l('درصورت لزوم به شما اطلاع داده میشود که این توکن را برای ما ارسال کنید.'),
+                        'name' => 'SELLER_TOKEN',
+                        'label' => $this->l(''),
+                        'readonly' => true,
                     )
                 ),
                 'submit' => array(
@@ -164,7 +177,8 @@ class Shareino extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'SHAREINO_API_TOKEN' => Configuration::get('SHAREINO_API_TOKEN', "")
+            'SHAREINO_API_TOKEN' => Configuration::get('SHAREINO_API_TOKEN', ""),
+            'SELLER_TOKEN' => Configuration::get('SELLER_TOKEN', "")
         );
     }
 
@@ -348,4 +362,54 @@ class Shareino extends Module
     {
         $this->hookActionProductSave($params);
     }
+
+    public static function randomBytes($length)
+    {
+        if (function_exists('random_bytes')) {
+            return random_bytes($length);
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            $bytes = openssl_random_pseudo_bytes($length, $strongSource);
+            if (!$strongSource) {
+                trigger_error(
+                    'openssl was unable to use a strong source of entropy. ' .
+                    'Consider updating your system libraries, or ensuring ' .
+                    'you have more available entropy.',
+                    E_USER_WARNING
+                );
+            }
+
+            return $bytes;
+        }
+
+        trigger_error(
+            'You do not have a safe source of random data available. ' .
+            'Install either the openssl extension, or paragonie/random_compat. ' .
+            'Falling back to an insecure random source.',
+            E_USER_WARNING
+        );
+
+        return static::insecureRandomBytes($length);
+    }
+
+    public static function insecureRandomBytes($length)
+    {
+        $byteLength = 0;
+        $length *= 2;
+        $bytes = '';
+        while ($byteLength < $length) {
+            $bytes .= static::hash(uniqid('-') . uniqid(mt_rand(), true), 'sha512', true);
+            $byteLength = strlen($bytes);
+        }
+        $bytes = substr($bytes, 0, $length);
+
+        return pack('H*', $bytes);
+    }
+
+    public static function hash($string, $type = null, $salt = false)
+    {
+        return hash(strtolower($type), $salt . $string);
+    }
+
 }

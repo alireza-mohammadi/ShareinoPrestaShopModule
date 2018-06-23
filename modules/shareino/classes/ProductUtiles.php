@@ -172,8 +172,9 @@ class ProductUtiles
                 case 408:
                     return array('status' => false, 'message' => 'خطا! درخواست منقضی شد.');
                 case 429:
-                case 0:
                     return array('status' => false, 'code' => 429, 'message' => 'فرایند ارسال محصولات به طول می انجامد لطفا صبور باشید.');
+                case 0:
+                    return array('status' => false, 'code' => 0, 'message' => 'خطایی در ارسال محصولات وجود دارد.');
                 default:
                     return array('status' => false, 'message' => "error: $httpcode");
             }

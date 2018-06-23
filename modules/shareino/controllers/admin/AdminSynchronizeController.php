@@ -22,7 +22,6 @@ require_once(dirname(__FILE__) . '/../../classes/ProductUtiles.php');
 
 class AdminSynchronizeController extends ModuleAdminController
 {
-
     public function __construct()
     {
         $this->module = 'shareino';
@@ -60,7 +59,6 @@ class AdminSynchronizeController extends ModuleAdminController
 
         parent::__construct();
     }
-
 
     protected function processBulkSynchronizeAction()
     {
@@ -158,5 +156,4 @@ class AdminSynchronizeController extends ModuleAdminController
                 $this->treeCategories($category['children'], $outPut);
         }
     }
-
 }
