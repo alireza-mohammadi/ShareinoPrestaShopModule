@@ -30,7 +30,7 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
 
             if (empty($ids)) {
                 echo Tools::jsonEncode(['status' => false, 'message' => 'کالایی با این ایدی پیدا نشد.'], true);
-                return;
+                return $this->setTemplate();
             }
 
             // get product detail
