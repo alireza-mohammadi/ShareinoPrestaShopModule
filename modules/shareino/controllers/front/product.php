@@ -63,7 +63,7 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
         $tblProduct = _DB_PREFIX_ . 'product';
         $tblCategoryProduct = _DB_PREFIX_ . 'category_product';
 
-        $category = implode(',', $category);
+        $category = implode(',', Tools::jsonDecode($category));
 
         $query = "SELECT `$tblProduct`.`id_product` FROM `$tblProduct`
                   INNER JOIN `$tblCategoryProduct` ON `$tblCategoryProduct` . `id_product` = `$tblProduct` . `id_product`
