@@ -15,8 +15,8 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
         if ($auth->auth()) {
 
             if (!isset($_GET['id'])) {
-                echo Tools::jsonEncode(['status' => false, 'message' => 'error'], true);
-                return;
+                echo Tools::jsonEncode(['status' => false, 'message' => 'خطا! ایدی کالا وارد نشده است.'], true);
+                return $this->setTemplate();
             }
 
             $tblProduct = _DB_PREFIX_ . 'product';
@@ -24,12 +24,12 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
 
             if (empty($id)) {
                 echo Tools::jsonEncode(['status' => false, 'message' => 'کالایی با این ایدی پیدا نشد.'], true);
-                return;
+                return $this->setTemplate();
             }
 
             if (!$this->checkCategory($id)) {
                 echo Tools::jsonEncode(['status' => false, 'message' => 'در دسته بندی انتخاب شده نیست.'], true);
-                return;
+                return $this->setTemplate();
             }
 
             $productUtiles = new ProductUtiles($this->context);
