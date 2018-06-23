@@ -424,7 +424,7 @@ class ProductUtiles
 
             $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
                 WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"] . 'AND id_group IN(0, 1, 2)';
-            
+
             $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
             foreach ($specificPricess as $vSpecificPrice) {
                 if ($vSpecificPrice['price'] < 0) {
