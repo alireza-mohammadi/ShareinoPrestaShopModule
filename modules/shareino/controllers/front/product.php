@@ -20,7 +20,7 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
             }
 
             $tblProduct = _DB_PREFIX_ . 'product';
-            $id = Db::getInstance()->execute("SELECT `id_product` FROM `$tblProduct` WHERE `$tblProduct`.`active` = 1 AND `id_product`=" . $_GET['id']);
+            $id = Db::getInstance()->executeS("SELECT `id_product` FROM `$tblProduct` WHERE `$tblProduct`.`active` = 1 AND `id_product`=" . $_GET['id']);
 
             if (empty($id)) {
                 echo Tools::jsonEncode(['status' => false, 'message' => 'کالایی با این ایدی پیدا نشد.'], true);
@@ -57,7 +57,7 @@ class ShareinoProductModuleFrontController extends ModuleFrontController
         $category = Configuration::get('SHAREINO_SELECT_CATEGORY');
 
         if (empty($category)) {
-            return false;
+            return true;
         }
 
         $tblProduct = _DB_PREFIX_ . 'product';
