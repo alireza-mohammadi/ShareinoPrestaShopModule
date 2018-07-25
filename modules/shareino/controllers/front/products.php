@@ -19,20 +19,36 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        $data = array('status' => true);
+        $data = array(
+            'status' => true,
+            'total' => $this->getTotal(),
+            'per_page' => self::SIZE,
+            'current_page' => $_GET['page'],
+            'last_page' => ceil($this->getTotal() / self::SIZE)
+        );
 
         $auth = new dokmeAuth();
         if ($auth->auth()) {
+
+            if (!isset($_GET['page'])) {
+                echo Tools::jsonEncode(['status' => false, 'message' => 'خطا! صفحه‌بندی وارد نشده است.'], true);
+                return $this->setTemplate();
+            }
+
+            $currentPage = ((int)$_GET['page'] - 1) * self::SIZE;
 
             $tblProduct = _DB_PREFIX_ . 'product';
             $tblSync = _DB_PREFIX_ . 'dokme_synchronize';
             $tabCategoryProduct = _DB_PREFIX_ . 'category_product';
 
             if ($this->getSelectedCategories() === false) {
-                $query = "SELECT `id_product` FROM `$tblProduct` LEFT JOIN `$tblSync` ON `$tblProduct`.`date_upd` > `$tblSync`.`date_sync` WHERE `$tblProduct`.`active` = 1 GROUP BY `$tblProduct`.`id_product` limit " . self::SIZE;
+                $query = "SELECT `id_product` FROM `$tblProduct` 
+                          LEFT JOIN `$tblSync` ON `$tblProduct`.`id_product` = `$tblSync`.`product_id` 
+                          AND `$tblProduct`.`date_upd` > `$tblSync`.`date_sync` 
+                          WHERE `$tblProduct`.`active` = 1  limit " . self::SIZE . " OFFSET $currentPage";
             } else {
                 $category = implode(',', $this->getSelectedCategories());
-                $query = "SELECT `$tabCategoryProduct`.`id_product` FROM `$tabCategoryProduct` LEFT JOIN `$tblProduct` ON `$tblProduct`.`id_product` = `$tabCategoryProduct`.`id_product` AND `$tblProduct`.`active` = 1 WHERE `$tabCategoryProduct`.`id_category` IN($category) GROUP BY `id_product` ASC limit " . self::SIZE;
+                $query = "SELECT `$tabCategoryProduct`.`id_product` FROM `$tabCategoryProduct` LEFT JOIN `$tblProduct` ON `$tblProduct`.`id_product` = `$tabCategoryProduct`.`id_product` AND `$tblProduct`.`active` = 1 WHERE `$tabCategoryProduct`.`id_category` IN($category) GROUP BY `id_product` ASC limit " . self::SIZE . " OFFSET $currentPage";
             }
             $ids = Db::getInstance()->executeS($query);
 
@@ -77,6 +93,22 @@ class ShareinoProductsModuleFrontController extends ModuleFrontController
             return false;
         }
         return Tools::jsonDecode($categories);
+    }
+
+    protected function getTotal()
+    {
+        $tblProduct = _DB_PREFIX_ . 'product';
+        $tblSync = _DB_PREFIX_ . 'dokme_synchronize';
+        $tabCategoryProduct = _DB_PREFIX_ . 'category_product';
+
+        if ($this->getSelectedCategories() === false) {
+            $query = "SELECT `id_product` FROM `$tblProduct` LEFT JOIN `$tblSync` ON `$tblProduct`.`date_upd` > `$tblSync`.`date_sync` WHERE `$tblProduct`.`active` = 1 GROUP BY `$tblProduct`.`id_product`";
+        } else {
+            $category = implode(',', $this->getSelectedCategories());
+            $query = "SELECT `$tabCategoryProduct`.`id_product` FROM `$tabCategoryProduct` LEFT JOIN `$tblProduct` ON `$tblProduct`.`id_product` = `$tabCategoryProduct`.`id_product` AND `$tblProduct`.`active` = 1 WHERE `$tabCategoryProduct`.`id_category` IN($category) GROUP BY `id_product`";
+        }
+        $ids = Db::getInstance()->executeS($query);
+        return count($ids);
     }
 
 }
