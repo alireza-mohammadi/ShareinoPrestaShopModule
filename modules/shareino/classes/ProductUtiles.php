@@ -351,10 +351,12 @@ class ProductUtiles
     {
         // Check Availability of sell out of stock products
         $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
-        $out_of_stock = $stockAvalible->out_of_stock;
-        if ($out_of_stock == 2)
-            $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
 
+        $out_of_stock = $stockAvalible->out_of_stock;
+        if ($out_of_stock == 2) {
+            $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
+        }
+        
         $images = Image::getImages($this->context->language->id, $product->id);
 
         $coverPath = "";
@@ -371,18 +373,14 @@ class ProductUtiles
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
 
-
         $variations = array();
         $priceWithoutReduct = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
-
 
         $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
                 WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0 AND id_group IN(0, 1, 2)';
         $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
         $discounts = array();
         foreach ($specificPrices as $specificPrice) {
-//        if ($specificPrice) {
-            $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
             if ($specificPrice['price'] < 0) {
                 $discount = array(
                     'start_date' => $specificPrice['from'],
@@ -472,11 +470,11 @@ class ProductUtiles
             "name" => $product->name,
             "code" => $product->id,
             "sku" => $product->reference,
-            "price" => $priceWithoutReduct,
+            "price" => (float)$priceWithoutReduct,
             "active" => $product->active,
             "discount" => $discounts,
             "sale_price" => "",
-            "quantity" => Product::getQuantity($product->id),
+            "quantity" => (int)Product::getQuantity($product->id),
             "weight" => $product->weight,
             "available_for_order" => $product->available_for_order,
             "original_url" => $link->getProductLink($product),
@@ -490,7 +488,7 @@ class ProductUtiles
             "images" => $imagesPath,
             "attributes" => $attributes,
             "variants" => $variations,
-            "out_of_stock" => $out_of_stock,
+            "out_of_stock" => (int)$out_of_stock,
             "tags" => $tags
         );
 
