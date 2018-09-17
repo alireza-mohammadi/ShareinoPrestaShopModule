@@ -220,14 +220,15 @@ class ProductUtiles
     public function getProductDiscountDetailById($productId = null)
     {
         $product = new Product($productId, false, $this->context->language->id);
+
         $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
         $out_of_stock = $stockAvalible->out_of_stock;
-        if ($out_of_stock == 2)
+        if ($out_of_stock == 2) {
             $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
+        }
 
+        $coverPath = '';
         $images = Image::getImages($this->context->language->id, $product->id);
-
-        $coverPath = "";
         $imagesPath = array();
         $link = new Link; //because getImageLInk is not static function
         foreach ($images as $image) {
@@ -241,20 +242,16 @@ class ProductUtiles
         // Get Variant
         $vars = $product->getAttributeCombinations($this->context->language->id);
 
-
         $variations = array();
         $discount = array();
         $price = $product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false, 0);
 
-        // $specificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
                 WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=0 AND id_group IN(0, 1, 2)';
         $specificPrices = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
         $discounts = array();
         foreach ($specificPrices as $specificPrice) {
-//        if ($specificPrice) {
             $price = $product->getPriceWithoutReduct(Product::$_taxCalculationMethod == PS_TAX_INC);
-            //if ($specificPrice['price'] < 0) {
             $discount = array(
                 'start_date' => $specificPrice['from'],
                 'end_date' => $specificPrice['to'],
@@ -273,7 +270,6 @@ class ProductUtiles
             $discount["price"] = $specificPrice['price'];
 
             array_push($discounts, $discount);
-            // }
         }
 
         foreach ($vars as $var) {
@@ -295,10 +291,7 @@ class ProductUtiles
             $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'specific_price pf
                 WHERE pf.id_product = ' . (int)$product->id . ' and id_product_attribute=' . (int)$var["id_product_attribute"] . 'AND id_group IN(0, 1, 2)';
             $specificPricess = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
-////            $vSpecificPrice = SpecificPriceCore::getSpecificPrice($product->id, 0, 0, 0, 0, null, $var["id_product_attribute"]);
             foreach ($specificPricess as $vSpecificPrice) {
-                // if ($vSpecificPrice) {
-                // if ($vSpecificPrice['price'] < 0) {
                 $vdiscount = array(
                     'start_date' => $vSpecificPrice['from'],
                     'end_date' => $vSpecificPrice['to'],
@@ -315,7 +308,6 @@ class ProductUtiles
                     $vdiscount['amount'] = $vSpecificPrice['reduction'] * 100;
                 }
                 $vdiscount["type"] = $vSpecificPrice['price'];
-                // }
             }
             $variations[$var["id_product_attribute"]]["discount"] = $vdiscount;
         }
@@ -325,12 +317,11 @@ class ProductUtiles
             "name" => $product->name,
             "code" => $product->id,
             "sku" => $product->reference,
-            "price" => $price,
+            "price" => (float)$price,
             "active" => $product->active,
             "discount" => $discounts,
             "variants" => $variations,
         );
-
 
         return $product_detail;
     }
@@ -349,19 +340,17 @@ class ProductUtiles
 
     public function getProductDetail($product)
     {
-        // Check Availability of sell out of stock products
         $stockAvalible = new StockAvailableCore($product->id, $this->context->language->id);
-
         $out_of_stock = $stockAvalible->out_of_stock;
         if ($out_of_stock == 2) {
             $out_of_stock = ConfigurationCore::get("PS_ORDER_OUT_OF_STOCK");
         }
-        
+
         $images = Image::getImages($this->context->language->id, $product->id);
 
-        $coverPath = "";
         $imagesPath = array();
-        $link = new Link; //because getImageLInk is not static function
+        $coverPath = '';
+        $link = new Link;
         foreach ($images as $image) {
             if ($image["cover"]) {
                 $coverPath = $link->getImageLink($product->link_rewrite, $image['id_image'], 'thickbox_default');
