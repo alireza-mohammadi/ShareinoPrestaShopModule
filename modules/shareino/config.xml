@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
 	<name>shareino</name>
-	<displayName><![CDATA[Shareino]]></displayName>
+	<displayName><![CDATA[Dokme]]></displayName>
 	<version><![CDATA[1.3.12]]></version>
-	<description><![CDATA[Make Sync Your Product with shareino server]]></description>
+	<description><![CDATA[Make Sync Your Product with dokme server]]></description>
 	<author><![CDATA[Saeed Darvish]]></author>
 	<tab><![CDATA[export]]></tab>
 	<confirmUninstall><![CDATA[Are you sure you want to uninstall?]]></confirmUninstall>

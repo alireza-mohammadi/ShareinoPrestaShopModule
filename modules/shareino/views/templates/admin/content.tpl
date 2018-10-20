@@ -12,56 +12,47 @@
             <div class="row">
                 <div class="col-xs-12">
                     <p style="font-size: 19px; font-weight: bolder" class="text-center">
-                        برای اتصال صحیح و ارسال خودکار محصولات خود به شرینو مراحل زیر را به ترتیب دنبال کنید
+                        برای اتصال صحیح و ارسال خودکار محصولات خود به دکمه مراحل زیر را به ترتیب دنبال کنید
                     </p>
 
                     <form class="" action="{$actionUrl}" method="post" id="syncAllProductsForm" data-token='{$token}'
                           data-operation="start">
-
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
-                            1. تنظیمات ماژول :
+                            ۱: تنظیمات ماژول
                         </h2>
-
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            قبل از ارسال کالا های فروشگاه برای شرینو لازم است طبق راهنمای شرینو ، توکن دریافتی را در بخش
+                            قبل از ارسال کالا های فروشگاه برای دکمه لازم است طبق راهنمای دکمه ، توکن دریافتی را در بخش
                             تنظیمات ماژول درج کنید .
-
                             <br/>
-
                             <a href="{$url|escape:'htmlall':'UTF-8'}" class="btn btn-default"><span
                                         class="glyphicon glyphicon-cog"></span>
                                 تنظیمات ماژول</a>
                         </p>
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
-
-
-                            2. سینک دسته بندی ها </h2>
-
+                            ۲: ارسال دسته‌بندی‌ها
+                        </h2>
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            قبل از ارسال محصولات به شرینو ، لازم است در ابتدا دسته بندی های خود رو جهت همسان سازی با
-                            شرینو ، ارسال کنید .
+                            قبل از ارسال محصولات به دکمه ، لازم است در ابتدا دسته بندی های خود رو جهت همسان سازی با
+                            دکمه، ارسال کنید .
                             <br/>
                             <button type="button" class="btn btn-default" name="shareino_send_categories"
                                     id="sendCatsBtn">
                                 <span class="glyphicon glyphicon-send" aria-hidden="true"
                                       style="display: inline;"></span>
-                                ارسال تمامی دسته بندی ها
+                                ارسال دسته‌بندی‌ها
                             </button>
                         </p>
-
-
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
-
-                            3. سینک محصولات </h2>
-
+                            ۳: ارسال محصولات
+                        </h2>
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
-                            برای همسان سازی کالاها بر روی دکمه زیر کلیک کنید
+                            برای ارسال کالاها بر روی دکمه زیر کلیک کنید.
                             <br/>
                             <button type="submit" class="btn btn-default" name="shareino_synchronize_all"
                                     id="syncSumblit">
                                 <span class="glyphicon glyphicon-send" aria-hidden="true"
                                       style="display: inline;"></span>
-                                همسان سازی همه محصولات
+                                ارسال محصولات
                             </button>
                         </p>
 
@@ -69,33 +60,27 @@
                             نکته : مراحل فوق را فقط در ابتدای نصب ماژول و فقط یک بار لازم است انجام دهید
                         </p>
                         <h2 class="text-right" style="direction: rtl;font-weight: bold">
-                            4. سینک تخفیف ها
+                            ۴: ارسال تخفیف ها
                         </h2>
 
                         <p class="text-right" style="font-size: 16px; margin-top: 10px">
 
-                            اگر تخفیف فعالی در فروشگاه خود دارید برای همسان سازی و ارسال تخفیف ها به شرینو از این گزینه
+                            اگر تخفیف فعالی در فروشگاه خود دارید برای همسان سازی و ارسال تخفیف ها به دکمه از این گزینه
                             استفاده کنید .
-                            بعد از هر بار تغییر در تخفیف ها لازم است ، همسان سازی تخفیف ها را مجددا انجام دهید .
-
+                            بعد از هر بار تغییر در تخفیف ها لازم است ، ارسال تخفیف‌ها را مجددا انجام دهید .
                             <br/>
                             <button type="button" class="btn btn-default" name="shareino_synchronize_all"
                                     id="syncDiscount">
                                 <span class="glyphicon glyphicon-send" aria-hidden="true"
                                       style="display: inline;"></span>
-                                همسان سازی تخفیف های محصولات
+                                ارسال تخفیف‌ها
                             </button>
                         </p>
-
-
                     </form>
-
-
                     <div id="loadingBox" hidden class="text-center"><img
                                 src="{$module_dir|escape:'htmlall':'UTF-8'}shareino/views/img/loader.gif"
                                 alt="" title=""/>
                     </div>
-
                     <div class="text-center" id="progress" hidden>
                         <p class="label label-default" id="progressText"></p>
                         <div class="progress">
@@ -105,8 +90,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -200,11 +183,11 @@
         function SyncProducts() {
 
             if (productIDs.length <= 0) {
-                messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
+                messageText.html("تمامی محصولات با سایت دکمه ارسال شد.");
                 messageBox.show(500);
                 messageBox.removeClass("alert-danger");
                 messageBox.addClass('alert-success');
-                submitBtn.html("همسان سازی همه");
+                submitBtn.html("ارسال همه");
                 return;
             }
 
@@ -225,7 +208,7 @@
                 }).done(function (data) {
                     if (data.status === false) {
                         if (data.code === 429 || data.code === 0) {
-                            message(true, "فرایند هماهنگ سازی ممکن است مدتی طول بکشد لطفا صبور باشید");
+                            message(true, "فرایند ارسال محصولات کمی زمان بر می‌باشد.");
                             setTimeout(SyncProducts, 61 * 1000);
                         } else {
                             message(data.status, data.message);
@@ -242,11 +225,11 @@
 
         function SyncDiscount() {
             if (productIDs.length <= 0) {
-                messageText.html("تمامی محصولات با سایت شیرینو همسان سازی شدند");
+                messageText.html("تمامی محصولات به سایت دکمه ارسال شد.");
                 messageBox.show(500);
                 messageBox.removeClass("alert-danger");
                 messageBox.addClass('alert-success');
-                submitBtn.html("همسان سازی همه");
+                submitBtn.html("ارسال همه");
                 return;
             }
 
@@ -285,7 +268,7 @@
         function setPercentage() {
             var percentage = Math.round(((lenght - productIDs.length) * 100) / lenght);
             percentage = percentage > 100 ? 100 : percentage;
-            var text = " تعداد " + (lenght - productIDs.length) + " از " + lenght + " محصول همسان سازی شد. ";
+            var text = " تعداد " + (lenght - productIDs.length) + " از " + lenght + " محصول ارسال شد. ";
             progressText.html(text);
             submitProgress
                 .css("width", percentage + "%")
@@ -298,7 +281,7 @@
         }
 
         function stopSync() {
-            submitBtn.html("همسان سازی همه");
+            submitBtn.html("ارسال همه");
             syncFrom.attr("data-operation", "start");
 
             submitProgress.css("width", "0%")

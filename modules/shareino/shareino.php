@@ -43,8 +43,8 @@ class Shareino extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Shareino');
-        $this->description = $this->l('Make Sync Your Product with shareino server');
+        $this->displayName = $this->l('Dokme');
+        $this->description = $this->l('Make Sync Your Product with Dokme server');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -275,8 +275,6 @@ class Shareino extends Module
 
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
-            if ($result["status"])
-                $productUtil->parsSyncResult($result["data"], $product_id);
         }
 
         return $params;
@@ -292,8 +290,6 @@ class Shareino extends Module
 
         if ($product["active"]) {
             $result = $productUtil->sendRequset("products", "POST", Tools::jsonEncode($product));
-            if ($result["status"])
-                $productUtil->parsSyncResult($result["data"], $params['id_product']);
         }
     }
 
@@ -310,7 +306,7 @@ class Shareino extends Module
         // Install Tabs
         $parent_tab = new Tab();
         // Need a foreach for the language
-        $parent_tab->name[$this->context->language->id] = $this->l('Shareino');
+        $parent_tab->name[$this->context->language->id] = $this->l('Dokme');
         $parent_tab->id_parent = 0; // Home tab
         $parent_tab->class_name = 'AdminSynchronize';
         $parent_tab->module = $this->name;
