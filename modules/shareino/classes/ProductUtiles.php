@@ -24,8 +24,6 @@ class ProductUtiles
 
     public $context;
 
-    const SHAREINO_API_URL = "https://dokme.com/api/v1/public/";
-
     public function __construct($context)
     {
         $this->context = $context;
@@ -131,7 +129,8 @@ class ProductUtiles
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
-        curl_setopt($curl, CURLOPT_URL, self::SHAREINO_API_URL . $url);
+        $url = sprintf('https://dokme.com/api/v1/public/%s', $url);
+        curl_setopt($curl, CURLOPT_URL, $url);
 
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
 
@@ -470,10 +469,11 @@ class ProductUtiles
         return $product_detail;
     }
 
-    public function deleteProducts($ids, $all = false)
+    public function deleteProducts($id, $all = false)
     {
         $body = array();
-        $url = "products/$ids";
+        $url = sprintf('products/%s', $id);
+
         $result = $this->sendRequset($url, 'DELETE', Tools::jsonEncode($body));
         return Tools::jsonDecode($result, true);
     }

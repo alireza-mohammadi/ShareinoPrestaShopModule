@@ -93,11 +93,8 @@ class ShareinoSync extends ObjectModel
 
     public function deleteProduct($id)
     {
-
         $tbl = _DB_PREFIX_ . $this->def['table'];
-
         $sql = "DELETE FROM $tbl WHERE product_id=$id";
-
         return Db::getInstance()->query($sql);
     }
 
